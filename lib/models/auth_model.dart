@@ -1,31 +1,30 @@
 import 'package:flutter/material.dart';
 
-class AuthData extends ChangeNotifier {
-  TextEditingController userIDController = TextEditingController();
+class AuthModel extends ChangeNotifier {
+  TextEditingController passwordController = TextEditingController();
+  TextEditingController confirmPasswordController = TextEditingController();
   TextEditingController emailController = TextEditingController();
   TextEditingController nameController = TextEditingController();
-  FocusNode userIdFocusNode = FocusNode();
+  FocusNode passwordFocusNode = FocusNode();
+  FocusNode confirmPasswordFocusNode = FocusNode();
   FocusNode emailFocusNode = FocusNode();
   FocusNode nameFocusNode = FocusNode();
+  // late String errMsg;
 
   bool firstTime = true;
-  String name = '';
-  String email = '';
-  String userID = '';
-  // Add more fields as needed
-
-  void updateName(String newName) {
-    name = newName;
+  bool loading = false;
+  void updateLoading(bool loading) {
+    loading = loading;
     notifyListeners();
   }
 
-  void updateEmail(String newEmail) {
-    email = newEmail;
-    notifyListeners();
-  }
-
-  void updateUserID(String userID) {
-    userID = userID;
+  void reset() {
+    firstTime = false;
+    loading = false;
+    passwordController.text = "";
+    confirmPasswordController.text = "";
+    emailController.text = "";
+    nameController.text = "";
     notifyListeners();
   }
 }

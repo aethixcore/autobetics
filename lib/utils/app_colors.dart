@@ -4,126 +4,51 @@ import 'package:flutter/material.dart';
 
  */
 class AppColors {
-  static const Color accent = Color.fromRGBO(192, 241, 211, 1);
-  static const Color primary = Color.fromRGBO(251, 255, 235, 1);
-  static const Color onAccent = Color.fromRGBO(221, 255, 221, 1);
-  static const Color background = Color.fromRGBO(170, 191, 84, 1);
-  static const Color onBackground = Color.fromRGBO(251, 255, 235, 1);
-  static const Color dark = Color.fromRGBO(17, 30, 17, 1);
-  static const Color onDark = Color.fromRGBO(17, 30, 17, 0.979);
-  static const Color error = Color.fromRGBO(245, 11, 11, 1);
-  static const Color onError = Color.fromRGBO(245, 11, 11, 0.979);
-  static const Color light = Color.fromRGBO(117, 230, 117, 1);
-  static const Color onPrimary = Color.fromRGBO(11, 35, 23, 0.979);
+  static const Color accent = Color.fromRGBO(183, 250, 209, 1);
+  static const Color onAccent = Color.fromRGBO(40, 173, 91, 1);
+  static const Color background = Color.fromRGBO(253, 255, 252, 1);
+  static const Color onBackground = Color.fromRGBO(71, 59, 99, 1);
+  static const Color primary = Color.fromRGBO(71, 83, 109, 1);
+  static const Color onPrimary = Color.fromRGBO(238, 245, 219, 1);
+  static const Color secondary = Color.fromRGBO(255, 111, 97, 1);
+  static const Color onSecondary = Color.fromRGBO(220, 238, 209, 1);
+  static const Color surface = Color.fromRGBO(242, 247, 248, 1);
+  static const Color onSurface = Color.fromRGBO(87, 92, 107, 1);
+  static const Color error = Color.fromRGBO(255, 0, 0, 1);
+  static const Color onError = Color.fromRGBO(255, 255, 255, 1);
+  // static const Color light = Color.fromRGBO(0, 108, 103, 1);
+
+  // static const Color dark = Color.fromRGBO(130, 224, 220, 1);
+//   static const Color primary = Color.fromRGBO(197, 121, 83, 0.904);
+//   static const Color surface = Color.fromRGBO(245, 245, 245, 1);
+//   static const Color onSurface = Color.fromRGBO(26, 23, 15, 1);
+//   static const Color onPrimary = Color.fromRGBO(230, 192, 87, 1);
+//   static const Color background = Color.fromRGBO(250, 253, 235, 1);
+//   static const Color onBackground = Color.fromRGBO(240, 240, 212, 0.884);
+//   static const Color dark = Color.fromRGBO(17, 30, 17, 1);
+//   static const Color onDark = Color.fromRGBO(17, 30, 17, 0.979);
+//   static const Color error = Color.fromRGBO(211, 18, 18, 1);
+//   static const Color onError = Color.fromRGBO(211, 18, 18, 0.976);
 //   static const Color primary = Color.fromRGBO(85, 180, 244, 1);
-//   static const Color onPrimary = Color.fromRGBO(85, 180, 244, 0.904);
-  static const Color secondary = Color.fromRGBO(250, 130, 70, 1);
-  static const Color onSecondary = Color.fromRGBO(250, 130, 70, 0.836);
+//  static const Color onPrimary = Color.fromRGBO(85, 180, 244, 0.904);
+//   static Color secondary =
+//       const Color.fromRGBO(250, 130, 70, 1).withOpacity(0.45);
+//   static Color onSecondary =
+//       const Color.fromRGBO(250, 130, 70, 0.836).withOpacity(0.75);
 }
-/* 
-MaterialColor accentSwatch = MaterialColor(
-  AppColors.accent.value,
-  <int, Color>{
-    50: AppColors.accent.withOpacity(0.1),
-    100: AppColors.accent.withOpacity(0.2),
-    200: AppColors.accent.withOpacity(0.3),
-    300: AppColors.accent.withOpacity(0.4),
-    400: AppColors.accent.withOpacity(0.5),
-    500: AppColors.accent.withOpacity(0.6),
-    600: AppColors.accent.withOpacity(0.7),
-    700: AppColors.accent.withOpacity(0.8),
-    800: AppColors.accent.withOpacity(0.9),
-    900: AppColors.accent.withOpacity(1.0),
-  },
-);
-MaterialColor backgroundSwatch = MaterialColor(
-  AppColors.background.value,
-  <int, Color>{
-    50: AppColors.background.withOpacity(0.1),
-    100: AppColors.background.withOpacity(0.2),
-    200: AppColors.background.withOpacity(0.3),
-    300: AppColors.background.withOpacity(0.4),
-    400: AppColors.background.withOpacity(0.5),
-    500: AppColors.background.withOpacity(0.6),
-    600: AppColors.background.withOpacity(0.7),
-    700: AppColors.background.withOpacity(0.8),
-    800: AppColors.background.withOpacity(0.9),
-    900: AppColors.background.withOpacity(1.0),
-  },
-);
-MaterialColor darkSwatch = MaterialColor(
-  AppColors.dark.value,
-  <int, Color>{
-    50: AppColors.dark.withOpacity(0.1),
-    100: AppColors.dark.withOpacity(0.2),
-    200: AppColors.dark.withOpacity(0.3),
-    300: AppColors.dark.withOpacity(0.4),
-    400: AppColors.dark.withOpacity(0.5),
-    500: AppColors.dark.withOpacity(0.6),
-    600: AppColors.dark.withOpacity(0.7),
-    700: AppColors.dark.withOpacity(0.8),
-    800: AppColors.dark.withOpacity(0.9),
-    900: AppColors.dark.withOpacity(1.0),
-  },
-);
-MaterialColor errorSwatch = MaterialColor(
-  AppColors.error.value,
-  <int, Color>{
-    50: AppColors.error.withOpacity(0.1),
-    100: AppColors.error.withOpacity(0.2),
-    200: AppColors.error.withOpacity(0.3),
-    300: AppColors.error.withOpacity(0.4),
-    400: AppColors.error.withOpacity(0.5),
-    500: AppColors.error.withOpacity(0.6),
-    600: AppColors.error.withOpacity(0.7),
-    700: AppColors.error.withOpacity(0.8),
-    800: AppColors.error.withOpacity(0.9),
-    900: AppColors.error.withOpacity(1.0),
-  },
-);
-MaterialColor lightSwatch = MaterialColor(
-  AppColors.light.value,
-  <int, Color>{
-    50: AppColors.light.withOpacity(0.1),
-    100: AppColors.light.withOpacity(0.2),
-    200: AppColors.light.withOpacity(0.3),
-    300: AppColors.light.withOpacity(0.4),
-    400: AppColors.light.withOpacity(0.5),
-    500: AppColors.light.withOpacity(0.6),
-    600: AppColors.light.withOpacity(0.7),
-    700: AppColors.light.withOpacity(0.8),
-    800: AppColors.light.withOpacity(0.9),
-    900: AppColors.light.withOpacity(1.0),
-  },
-);
-MaterialColor primarySwatch = MaterialColor(
-  AppColors.primary.value,
-  <int, Color>{
-    50: AppColors.primary.withOpacity(0.1),
-    100: AppColors.primary.withOpacity(0.2),
-    200: AppColors.primary.withOpacity(0.3),
-    300: AppColors.primary.withOpacity(0.4),
-    400: AppColors.primary.withOpacity(0.5),
-    500: AppColors.primary.withOpacity(0.6),
-    600: AppColors.primary.withOpacity(0.7),
-    700: AppColors.primary.withOpacity(0.8),
-    800: AppColors.primary.withOpacity(0.9),
-    900: AppColors.primary.withOpacity(1.0),
-  },
-);
-MaterialColor secondarySwatch = MaterialColor(
-  AppColors.secondary.value,
-  <int, Color>{
-    50: AppColors.secondary.withOpacity(0.1),
-    100: AppColors.secondary.withOpacity(0.2),
-    200: AppColors.secondary.withOpacity(0.3),
-    300: AppColors.secondary.withOpacity(0.4),
-    400: AppColors.secondary.withOpacity(0.5),
-    500: AppColors.secondary.withOpacity(0.6),
-    600: AppColors.secondary.withOpacity(0.7),
-    700: AppColors.secondary.withOpacity(0.8),
-    800: AppColors.secondary.withOpacity(0.9),
-    900: AppColors.secondary.withOpacity(1.0),
-  },
-);
- */
+
+class DarkAppColors {
+  //dark varient
+  static const Color accent = Color.fromRGBO(34, 83, 81, 1);
+  static const Color onAccent = Color.fromRGBO(202, 219, 226, 1);
+  static const Color background = Color.fromRGBO(8, 11, 29, 1);
+  static const Color onBackground = Color.fromRGBO(202, 219, 226, 1);
+  static const Color primary = Color.fromRGBO(98, 144, 200, 1);
+  static const Color onPrimary = Color.fromRGBO(202, 219, 226, 1);
+  static const Color secondary = Color.fromRGBO(23, 37, 77, 1);
+  static const Color onSecondary = Color.fromRGBO(243, 201, 198, 1);
+  static const Color surface = Color.fromRGBO(46, 62, 92, 1);
+  static const Color onSurface = Color.fromRGBO(202, 219, 226, 1);
+  static const Color error = Color.fromRGBO(131, 23, 23, 1);
+  static const Color onError = Color.fromRGBO(238, 182, 182, 1);
+}

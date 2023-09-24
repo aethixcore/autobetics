@@ -6,11 +6,11 @@ import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 
 class AgePicker extends StatelessWidget {
-  AgePicker({super.key});
+  const AgePicker({super.key});
 
   Future<void> _selectDate(BuildContext context) async {
-    final onBoardingData = Provider.of<OnBoardingData>(context, listen: false);
-    DateTime selectedDate = onBoardingData.age;
+    final onBoardingModel = Provider.of<OnBoardingModel>(context, listen: false);
+    DateTime selectedDate = onBoardingModel.age;
     final DateTime? picked = await showDatePicker(
         context: context,
         initialDate: selectedDate,
@@ -21,10 +21,10 @@ class AgePicker extends StatelessWidget {
         cancelText: "CANCEL");
     if (picked != null) {
       // String dob = getFormattedDate(picked);
-      FocusScope.of(context).requestFocus(onBoardingData.weightFocusNode);
-      onBoardingData.updateAge(picked);
-      onBoardingData.age = picked;
-      onBoardingData.nextPage();
+      onBoardingModel.updateAge(picked);
+      onBoardingModel.age = picked;
+      onBoardingModel.nextPage();
+      FocusScope.of(context).requestFocus(onBoardingModel.weightFocusNode);
     }
   }
 
@@ -34,7 +34,7 @@ class AgePicker extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final data = Provider.of<OnBoardingData>(context, listen: true);
+    final data = Provider.of<OnBoardingModel>(context, listen: true);
     return Padding(
       padding: const EdgeInsets.all(20.0),
       child: Column(

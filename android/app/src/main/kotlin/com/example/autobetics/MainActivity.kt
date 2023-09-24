@@ -1,4 +1,4 @@
-package com.example.autobetics
+package com.autobetics
 
 import io.flutter.embedding.android.FlutterActivity
 

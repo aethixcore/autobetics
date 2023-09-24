@@ -1,10 +1,15 @@
-import 'package:autobetics/models/onboarding_model.dart';
-import 'package:autobetics/widgets/blood_pressure.dart';
-import 'package:autobetics/widgets/goals_checklist.dart';
-import 'package:autobetics/widgets/weight_input.dart';
+// ignore_for_file: library_private_types_in_public_api
+
+import 'dart:math';
+
 import 'package:flutter/material.dart';
-import 'package:autobetics/widgets/age_picker.dart';
 import 'package:provider/provider.dart';
+
+import 'package:autobetics/models/onboarding_model.dart';
+import 'package:autobetics/features/onboarding/widgets/blood_pressure.dart';
+import 'package:autobetics/features/onboarding/widgets/goals_checklist.dart';
+import 'package:autobetics/features/onboarding/widgets/weight_input.dart';
+import 'package:autobetics/features/onboarding/widgets/age_picker.dart';
 
 class OnboardingScreen extends StatefulWidget {
   const OnboardingScreen({super.key});
@@ -18,7 +23,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final onBoardingData = Provider.of<OnBoardingData>(context);
+    final onBoardingData = Provider.of<OnBoardingModel>(context);
     final List<OnboardingItem> onboardingItems = [
       OnboardingItem(
           title: 'Welcome to Autobetics',
@@ -35,8 +40,8 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
           subtitle:
               'We need this information to understand the kind of routine that best fits.',
           image: 'assets/onboard_1.png',
-          child: Padding(
-            padding: const EdgeInsets.all(12.0),
+          child: const Padding(
+            padding: EdgeInsets.all(12.0),
             child: AgePicker(),
           )),
       OnboardingItem(
@@ -44,20 +49,45 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
           subtitle:
               'Hint: Body mass index can indicate whether you’re at a healthy weight.',
           image: 'assets/onboard_2.png',
+          nextButton: ElevatedButton(
+            child: const Text("Next"),
+            onPressed: () {
+              if (onBoardingData.weightController.text.isNotEmpty) {
+                onBoardingData.nextPage();
+                FocusScope.of(context)
+                    .requestFocus(onBoardingData.systolicFocusNode);
+              } else {
+                FocusScope.of(context)
+                    .requestFocus(onBoardingData.weightFocusNode);
+              }
+            },
+          ),
           child: const WeightInputScreen()),
       OnboardingItem(
           title: 'Blood Pressure',
           subtitle: 'Previous systolic & diatolic pressure.',
           image: 'assets/onboard_3.png',
-          child: const BloodPressureInputWidget()),
+          child: const BloodPressureInputWidget(),
+          nextButton: ElevatedButton(
+            child: const Text("Next"),
+            onPressed: () {
+              if (onBoardingData.diastolicBPController.text.isEmpty) {
+                FocusScope.of(context)
+                    .requestFocus(onBoardingData.diastolicFocusNode);
+              } else if (onBoardingData.systolicBPController.text.isEmpty) {
+                FocusScope.of(context)
+                    .requestFocus(onBoardingData.systolicFocusNode);
+              } else {
+                onBoardingData.nextPage();
+              }
+            },
+          )),
       OnboardingItem(
-          title: 'Long term Archeivements',
+          title: 'Long Term Goals',
           subtitle: 'pick a one of few goals.',
           image: 'assets/onboard_4.png',
           nextButton: ElevatedButton(
               onPressed: () {
-                final onBoardingData =
-                    Provider.of<OnBoardingData>(context, listen: false);
                 onBoardingData.finishOnboarding(context);
               },
               child: const Text("FINISH")),
@@ -72,13 +102,16 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
         itemCount: onboardingItems.length,
         scrollDirection: Axis.vertical,
         pageSnapping: true,
-        onPageChanged: (int pageIndex) {
-          onBoardingData.updateCurrentPageIndex(pageIndex);
+        onPageChanged: (int _) {
+          onBoardingData.updateCurrentPageIndex(_);
         },
         itemBuilder: (context, index) {
           // ignore: sized_box_for_whitespace
-          return OnboardingPage(
-            item: onboardingItems[index],
+          return SingleChildScrollView(
+            controller: ScrollController(keepScrollOffset: true),
+            child: OnboardingPage(
+              item: onboardingItems[index],
+            ),
           );
         },
       ),
@@ -111,31 +144,33 @@ class OnboardingPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return SizedBox(
-      height: MediaQuery.of(context).size.height,
+    final onboardingModel =
+        Provider.of<OnBoardingModel>(context, listen: false);
+    return AnimatedContainer(
+      duration: const Duration(milliseconds: 900),
+      curve: Curves.decelerate,
+      padding: const EdgeInsets.all(e / log10e),
+      height: MediaQuery.sizeOf(context).height,
       child: Flex(
-        mainAxisAlignment: MainAxisAlignment.center,
-        mainAxisSize: MainAxisSize.max,
         direction: Axis.vertical,
         children: [
+          const SizedBox(height: 50),
+          Align(
+              alignment: Alignment.topRight,
+              child: Text("${onboardingModel.currentPageIndex + 1}/5")),
           if (item.prevButton != null)
             SizedBox(
+              height: 50,
               child: item.prevButton,
             ),
-          Padding(
-            padding: const EdgeInsets.all(12),
-            child: Text(item.title,
-                style:
-                    const TextStyle(fontSize: 36, fontWeight: FontWeight.bold)),
-          ),
-          Padding(
-            padding: const EdgeInsets.all(12),
-            child: Text(item.subtitle,
-                style: const TextStyle(
-                  fontSize: 18,
-                )),
-          ),
-          Image.asset(item.image, height: 200),
+          Text(item.title,
+              style:
+                  const TextStyle(fontSize: 32, fontWeight: FontWeight.bold)),
+          Text(item.subtitle,
+              style: const TextStyle(
+                fontSize: 16,
+              )),
+          Image.asset(item.image, height: 250),
           const SizedBox(height: 10),
           if (item.child != null)
             SizedBox(
