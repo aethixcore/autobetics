@@ -14,30 +14,29 @@ class Greeting extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       padding: const EdgeInsets.all(16.0),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: List.generate(2, (index) {
-          switch (index) {
-            case 0:
-              return Text(
-                'Hello, $userName!',
-                style: const TextStyle(
-                  fontSize: 18.0,
-                  fontWeight: FontWeight.w500,
-                ),
-              );
-            default:
-              return const Text(
-                'Good Evening.',
-                style: TextStyle(
-                  // color: ThemeData.from(colorScheme: colorScheme),
-                  shadows: [Shadow(blurRadius: 1.12)],
-                  fontSize: 25.0,
-                  fontWeight: FontWeight.bold,
-                ),
-              );
-          }
-        }),
+      child: Expanded(
+        flex: 1,
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              'Hello, $userName!',
+              style: const TextStyle(
+                fontSize: 18.0,
+                fontWeight: FontWeight.w500,
+              ),
+            ),
+            // const Text(
+            //   'Good Evening.',
+            //   style: TextStyle(
+            //     // color: ThemeData.from(colorScheme: colorScheme),
+            //     shadows: [Shadow(blurRadius: 1.12)],
+            //     fontSize: 25.0,
+            //     fontWeight: FontWeight.bold,
+            //   ),
+            // )
+          ],
+        ),
       ),
     );
   }

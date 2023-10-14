@@ -59,10 +59,15 @@ class MyApp extends StatelessWidget {
         useMaterial3: true,
       ),
       home: appData.freshLauched
-          ? const OnboardingProvider()
-          : const AuthProvider(),
+          ? const SafeArea(
+              child: OnboardingProvider(),
+            )
+          : const SafeArea(
+              child: AuthProvider(),
+            ),
       
       debugShowCheckedModeBanner: false,
+      
     );
   }
 }
