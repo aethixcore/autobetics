@@ -148,7 +148,7 @@ class _DashboardTabbarState extends State<DashboardTabbar>
         ),
         body: TabBarView(
           controller: _tabController,
-          children: [
+          children: const [
             // Content for Tab 1
             HomeScreen(),
             // Content for Tab 2

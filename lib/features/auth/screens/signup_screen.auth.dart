@@ -17,7 +17,7 @@ class RegisterScreen extends StatelessWidget {
     return Scaffold(
       body: SafeArea(
           top: false,
-          // maintainBottomViewPadding: true,
+          maintainBottomViewPadding: false,
           child: Stack(
             children: <Widget>[
               Image.asset("assets/insulin.jpg",

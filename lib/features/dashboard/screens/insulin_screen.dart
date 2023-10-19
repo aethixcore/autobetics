@@ -1,3 +1,5 @@
+// ignore_for_file: library_private_types_in_public_api
+
 import 'package:flutter/material.dart';
 
 class InsulinScreen extends StatefulWidget {
@@ -10,7 +12,7 @@ class InsulinScreen extends StatefulWidget {
 class _InsulinScreenState extends State<InsulinScreen> {
   late List<InsulinRecord> _insulinRecords = [];
   String _newInsulinValue = "";
-  DateTime _selectedDateTime = DateTime.now();
+  final DateTime _selectedDateTime = DateTime.now();
 
   @override
   void initState() {
@@ -40,12 +42,12 @@ class _InsulinScreenState extends State<InsulinScreen> {
                   fontWeight: FontWeight.bold,
                 ),
               ),
-              SizedBox(height: 10),
+              const SizedBox(height: 10),
               Row(
                 children: <Widget>[
                   Expanded(
                     child: TextFormField(
-                      decoration: InputDecoration(
+                      decoration: const InputDecoration(
                         labelText: 'Insulin Level (mg/dL)',
                       ),
                       keyboardType: TextInputType.number,
@@ -57,7 +59,7 @@ class _InsulinScreenState extends State<InsulinScreen> {
                       initialValue: _newInsulinValue,
                     ),
                   ),
-                  SizedBox(width: 10),
+                  const SizedBox(width: 10),
                   FloatingActionButton(
                     isExtended: true,
                     onPressed: () {
@@ -67,15 +69,15 @@ class _InsulinScreenState extends State<InsulinScreen> {
                   ),
                 ],
               ),
-              SizedBox(height: 20),
-              Text(
+              const SizedBox(height: 20),
+              const Text(
                 'Insulin History:',
                 style: TextStyle(
                   fontSize: 20,
                   fontWeight: FontWeight.bold,
                 ),
               ),
-              SizedBox(height: 10),
+              const SizedBox(height: 10),
               ListView.builder(
                 shrinkWrap: true,
                 itemCount: _insulinRecords.length,
@@ -115,7 +117,7 @@ class InsulinRecord {
 class InsulinRecordItem extends StatelessWidget {
   final InsulinRecord record;
 
-  InsulinRecordItem(this.record, {super.key});
+  const InsulinRecordItem(this.record, {super.key});
 
   @override
   Widget build(BuildContext context) {

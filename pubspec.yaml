@@ -48,6 +48,7 @@ dependencies:
     animated_notch_bottom_bar: ^1.0.0
     parse_server_sdk_flutter: ^5.1.0
     fpdart: ^1.1.0
+    fluttertoast: ^8.2.2
 
 dev_dependencies:
     flutter_test:

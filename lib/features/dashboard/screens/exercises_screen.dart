@@ -1,5 +1,3 @@
-import 'dart:math';
-
 import 'package:flutter/material.dart';
 
 class ExercisesScreen extends StatelessWidget {
@@ -35,7 +33,7 @@ class CategoryList extends StatelessWidget {
   Widget build(BuildContext context) {
     return Expanded(
       child: ListView(
-        children: <Widget>[
+        children: const <Widget>[
           CategoryItem(
             title: 'Cardiovascular',
             exercises: [
@@ -79,7 +77,7 @@ class CategoryItem extends StatelessWidget {
   final String title;
   final List<ExerciseItem> exercises;
 
-  CategoryItem({
+  const CategoryItem({
     super.key,
     required this.title,
     required this.exercises,
@@ -106,7 +104,7 @@ class CategoryItem extends StatelessWidget {
           const Divider(),
           ListView.builder(
             shrinkWrap: true,
-            padding: EdgeInsets.all(16),
+            padding: const EdgeInsets.all(16),
             physics: const NeverScrollableScrollPhysics(),
             itemCount: exercises.length,
             itemBuilder: (context, index) {
@@ -124,7 +122,7 @@ class ExerciseItem extends StatelessWidget {
   final String description;
   final String imageUrl;
 
-  ExerciseItem({
+  const ExerciseItem({
     super.key,
     required this.title,
     required this.description,

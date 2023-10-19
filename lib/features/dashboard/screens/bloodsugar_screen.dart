@@ -1,10 +1,12 @@
-import 'dart:math';
+// ignore_for_file: library_private_types_in_public_api
 
 import 'package:flutter/material.dart';
 import 'package:fl_chart/fl_chart.dart';
 import 'package:intl/intl.dart';
 
 class BloodSugarScreen extends StatefulWidget {
+  const BloodSugarScreen({super.key});
+
   @override
   _BloodSugarScreenState createState() => _BloodSugarScreenState();
 }
@@ -168,11 +170,11 @@ class _BloodSugarScreenState extends State<BloodSugarScreen> {
                     style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
                   ),
                   const SizedBox(height: 10),
-                  RecommendationItem(
+                  const RecommendationItem(
                     text:
                         'Maintain a balanced diet to stabilize your blood sugar levels.',
                   ),
-                  RecommendationItem(
+                  const RecommendationItem(
                     text:
                         'Regularly engage in physical activities like walking or jogging.',
                   ),
@@ -245,7 +247,7 @@ class BloodSugarData {
 class RecommendationItem extends StatelessWidget {
   final String text;
 
-  RecommendationItem({required this.text});
+  const RecommendationItem({super.key, required this.text});
 
   @override
   Widget build(BuildContext context) {
@@ -253,8 +255,8 @@ class RecommendationItem extends StatelessWidget {
       padding: const EdgeInsets.symmetric(vertical: 5),
       child: Row(
         children: [
-          Icon(Icons.check_circle, color: Colors.green),
-          SizedBox(width: 10),
+          const Icon(Icons.check_circle, color: Colors.green),
+          const SizedBox(width: 10),
           Text(text),
         ],
       ),
@@ -266,7 +268,7 @@ class HistoryItem extends StatelessWidget {
   final int value;
   final String date;
 
-  HistoryItem({required this.value, required this.date});
+  const HistoryItem({super.key, required this.value, required this.date});
 
   @override
   Widget build(BuildContext context) {

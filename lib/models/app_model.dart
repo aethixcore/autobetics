@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:animated_notch_bottom_bar/animated_notch_bottom_bar/animated_notch_bottom_bar.dart';
-
 import 'package:autobetics/utils/app_colors.dart';
 
 class AppModel extends ChangeNotifier {
- 
   late bool freshLauched = false;
+  late bool firstTime = true;
+  late bool verifiedEmail = false;
   late Map onboardingData;
   // final GlobalKey formState  = GlobalKey<FormState>;
 

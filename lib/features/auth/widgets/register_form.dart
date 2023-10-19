@@ -1,8 +1,13 @@
 // ignore_for_file: prefer_const_constructors_in_immutables, use_build_context_synchronously
 
+
+import 'package:autobetics/apis/apis.dart';
 import 'package:autobetics/constants/constants.dart';
+import 'package:autobetics/models/app_model.dart';
 import 'package:autobetics/models/auth_model.dart';
+import 'package:autobetics/providers/auth_provider.dart';
 import 'package:flutter/material.dart';
+
 import 'package:provider/provider.dart';
 
 class RegisterationForm extends StatefulWidget {
@@ -18,64 +23,25 @@ class _RegisterationFormState extends State<RegisterationForm> {
   @override
   Widget build(BuildContext context) {
     final authModel = Provider.of<AuthModel>(context, listen: true);
+    final appModel = Provider.of<AppModel>(context, listen: true);
     void handleSubmit() async {
       if (_formKey.currentState!.validate()) {
-        authModel.loading = true;
         authModel.updateLoading(true);
-        await Future.delayed(const Duration(seconds: 3));
-        authModel.loading = false;
-
-        authModel.reset();
-        verfiyEmailBottomModal(context);
-
-        /* final Client client = Client()
-            .setEndpoint(dotenv.get(
-              "APPWRITE_ENDPOINT",
-            ))
-            .setProject(dotenv.get("APPWRITE_PID"))
-            .setSelfSigned(status: true);
-        Account account = Account(client);
-        authModel.updateLoading(true);
-        try {
-          account
-              .create(
-            userId: ID.unique(),
-            password: authModel.passwordController.text,
-            email: authModel.emailController.text,
-            name: authModel.nameController.text,
-          )
-              .whenComplete(() async {
-            authModel.reset();
-            verfiyEmailBottomModal(context);
-
-            //  Navigator.of(context).pushReplacement(MaterialPageRoute(
-            //     builder: (context) => DashboardWithBottomNav())
-            //     );
-          // ScaffoldMessenger.of(context).showSnackBar(
-          //   const SnackBar(content: Text('Processing Data')),
-          // );
-          });
-
-        } on AppwriteException catch (e) {
-          if (e.message == "user_already_exists") {
-            showDialog(
-                context: context,
-                builder: (BuildContext context) {
-                  return AlertDialog(
-                    title: const Text("Not allowed"),
-                    content: Container(
-                      padding: const EdgeInsets.all(10),
-                      child: Text("""
-${authModel.emailController} is already a user here!"""),
-                    ),
-                    backgroundColor: Colors.red.shade50,
-                  );
-                });
-          }
-          throw Exception(e);
-        } catch (e) {
-          throw Exception(e);
-        } */
+      
+        final accountAPI = AuthAPI(account: autobetAccount);
+        accountAPI
+            .signUp(
+                email: authModel.emailController.text,
+                password: authModel.passwordController.text,
+                name: authModel.nameController.text)
+            .whenComplete(() {
+          authModel.reset();
+          authModel.updateLoading(false);
+          appModel.firstTime = false;
+          appModel.freshLauched = false;
+          Navigator.of(context).pushReplacement(
+              MaterialPageRoute(builder: (context) => const AuthProvider()));
+        });
       }
     }
 
@@ -129,6 +95,8 @@ ${authModel.emailController} is already a user here!"""),
                 validator: (value) {
                   if (value == null || value.isEmpty) {
                     return "Passowrd required";
+                  } else if (value.length < 8) {
+                    return "Password must be at least 8 characters!";
                   }
                   return null;
                 },

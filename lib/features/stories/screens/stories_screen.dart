@@ -1,5 +1,8 @@
+// ignore_for_file: library_private_types_in_public_api
+
 import 'package:autobetics/features/stories/widgets/stories_appbar.dart';
 import 'package:autobetics/features/stories/widgets/story_feed.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
 class StoriesScreen extends StatefulWidget {
@@ -34,6 +37,7 @@ class _StoriesState extends State<StoriesScreen> {
       appBar: const StoriesAppBar(),
       resizeToAvoidBottomInset: false,
       body: Container(
+        padding: EdgeInsets.zero,
         child: ListView.separated(
           controller: _scrollController,
           itemCount: stories.length,
@@ -44,7 +48,9 @@ class _StoriesState extends State<StoriesScreen> {
               onTap: () {
                 // Handle the tap on the story, e.g., navigate to a detailed view.
                 // You can replace this with your specific navigation logic.
-                print('StoryFeed tapped: ${stories[index].username}');
+                if (kDebugMode) {
+                  print('StoryFeed tapped: ${stories[index].username}');
+                }
               },
               child: Card(
                 elevation: 4, // Add elevation for a card-like effect

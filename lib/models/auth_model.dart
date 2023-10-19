@@ -11,15 +11,13 @@ class AuthModel extends ChangeNotifier {
   FocusNode nameFocusNode = FocusNode();
   // late String errMsg;
 
-  bool firstTime = true;
   bool loading = false;
   void updateLoading(bool loading) {
-    loading = loading;
     notifyListeners();
+    loading = loading;
   }
 
   void reset() {
-    firstTime = false;
     loading = false;
     passwordController.text = "";
     confirmPasswordController.text = "";

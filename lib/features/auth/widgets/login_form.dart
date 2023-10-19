@@ -1,5 +1,7 @@
-// ignore_for_file: prefer_const_constructors_in_immutables
-
+// ignore_for_file: prefer_const_constructors_in_immutables, use_build_context_synchronously
+import 'package:autobetics/apis/apis.dart';
+import 'package:autobetics/common/loaders.dart';
+import 'package:autobetics/constants/constants.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -19,17 +21,43 @@ class _LoginFormState extends State<LoginForm> {
 
   @override
   Widget build(BuildContext context) {
-    final authModel = Provider.of<AuthModel>(context);
-    // final String password = ID.unique();
-    void handleSubmit() {
+    final authModel = Provider.of<AuthModel>(context, listen: true);
+    void handleSubmit() async {
       if (_formKey.currentState!.validate()) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Processing Data')),
-        );
-        Navigator.of(context).pushReplacement(
-            MaterialPageRoute(builder: (context) => DashboardWithBottomNav()));
-      } else {
-        // Update error messages in the model.
+        final accountAPI = AuthAPI(account: autobetAccount);
+        authModel.updateLoading(true);
+        try {
+          final result = await accountAPI.signIn(
+            email: authModel.emailController.text,
+            password: authModel.passwordController.text,
+          );
+
+          // Check the result to determine if the authentication was successful.
+          if (result.isRight()) {
+            // Authentication successful, navigate to the dashboard.
+            authModel.reset();
+            authModel.updateLoading(false);
+            Navigator.of(context).pushReplacement(MaterialPageRoute(
+                builder: (context) => DashboardWithBottomNav()));
+          } else {
+            // Show a notification indicating authentication failure.
+            authModel.updateLoading(false);
+            ScaffoldMessenger.of(context).showSnackBar(
+              const SnackBar(
+                content: Text(
+                    'Invalid credentials. Please check the email and password.'),
+              ),
+            );
+            authModel.emailFocusNode.requestFocus();
+          }
+        } catch (error) {
+          // Handle other errors here, e.g., network issues.
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text('An error occurred. Please try again later.'),
+            ),
+          );
+        }
       }
     }
 
@@ -65,6 +93,8 @@ class _LoginFormState extends State<LoginForm> {
                 validator: (value) {
                   if (value == null || value.isEmpty) {
                     return "Passowrd required";
+                  } else if (value.length < 8) {
+                    return "Password must be at least 8 characters!";
                   }
                   return null;
                 },

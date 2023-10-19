@@ -8,7 +8,7 @@ class SupplementScreen extends StatefulWidget {
 }
 
 class _SupplementScreenState extends State<SupplementScreen> {
-  TextEditingController _supplementNameController = TextEditingController();
+  final TextEditingController _supplementNameController = TextEditingController();
 
   void _showAddSupplementModal(BuildContext context) {
     showModalBottomSheet(
@@ -16,25 +16,25 @@ class _SupplementScreenState extends State<SupplementScreen> {
       builder: (context) {
         return SingleChildScrollView(
           child: Container(
-            padding: EdgeInsets.all(16.0),
+            padding: const EdgeInsets.all(16.0),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: <Widget>[
-                Text(
+                const Text(
                   'Add New Supplement',
                   style: TextStyle(
                     fontSize: 20,
                     fontWeight: FontWeight.bold,
                   ),
                 ),
-                SizedBox(height: 10),
+                const SizedBox(height: 10),
                 TextField(
                   controller: _supplementNameController,
-                  decoration: InputDecoration(
+                  decoration: const InputDecoration(
                     labelText: 'Supplement Name',
                   ),
                 ),
-                SizedBox(height: 20),
+                const SizedBox(height: 20),
                 ElevatedButton(
                   onPressed: () {
                     // Implement logic to add the supplement based on the input.
@@ -44,7 +44,7 @@ class _SupplementScreenState extends State<SupplementScreen> {
                       Navigator.pop(context); // Close the modal.
                     }
                   },
-                  child: Text('Add Supplement'),
+                  child: const Text('Add Supplement'),
                 ),
               ],
             ),
@@ -80,20 +80,20 @@ class _SupplementScreenState extends State<SupplementScreen> {
                 },
                 child: const Icon(Icons.add),
               ),
-              SupplementItem(
+              const SupplementItem(
                 name: 'Vitamin C',
                 dosage: '1000mg',
                 frequency: 'Once daily',
               ),
-              SupplementItem(
+              const SupplementItem(
                 name: 'Fish Oil',
                 dosage: '500mg',
                 frequency: 'Twice daily',
               ),
               Expanded(
                 child: ListView(
-                  padding: EdgeInsets.all(16.0),
-                  children: <Widget>[
+                  padding: const EdgeInsets.all(16.0),
+                  children: const <Widget>[
                     RecommendedSupplementItem(
                       name: 'Vitamin D',
                       description: 'Supports bone health and immunity.',
@@ -127,7 +127,7 @@ class RecommendedSupplementItem extends StatelessWidget {
   final String description;
   final String imageUrl;
 
-  RecommendedSupplementItem({
+  const RecommendedSupplementItem({super.key, 
     required this.name,
     required this.description,
     required this.imageUrl,
@@ -137,7 +137,7 @@ class RecommendedSupplementItem extends StatelessWidget {
   Widget build(BuildContext context) {
     return Card(
       elevation: 2.0,
-      margin: EdgeInsets.symmetric(vertical: 8.0),
+      margin: const EdgeInsets.symmetric(vertical: 8.0),
       child: ListTile(
         leading: Container(
           width: 60.0,
@@ -151,10 +151,10 @@ class RecommendedSupplementItem extends StatelessWidget {
             borderRadius: BorderRadius.circular(10.0),
           ),
         ),
-        title: Text(name, style: TextStyle(fontWeight: FontWeight.bold)),
+        title: Text(name, style: const TextStyle(fontWeight: FontWeight.bold)),
         subtitle: Text(description),
         trailing: IconButton(
-          icon: Icon(Icons.add),
+          icon: const Icon(Icons.add),
           onPressed: () {
             // Implement functionality to add recommended supplement to user's list.
           },
@@ -169,7 +169,7 @@ class SupplementItem extends StatelessWidget {
   final String dosage;
   final String frequency;
 
-  SupplementItem({
+  const SupplementItem({
     super.key,
     required this.name,
     required this.dosage,

@@ -7,9 +7,10 @@ import 'package:autobetics/providers/onboarding_provider.dart';
 import 'package:autobetics/providers/auth_provider.dart';
 import 'package:autobetics/utils/app_colors.dart';
 
+GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
 void main() async {
   await dotenv.load(fileName: ".env");
-    
+
   runApp(ChangeNotifierProvider(
     lazy: true,
     create: (context) => AppModel(),
@@ -45,12 +46,12 @@ ColorScheme darkTheme = const ColorScheme(
 
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
-
-  // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
     final appData = Provider.of<AppModel>(context);
     return MaterialApp(
+      // builder: FToastBuilder(),
+      // navigatorKey: navigatorKey,
       theme: ThemeData(
         colorScheme:
             MediaQuery.of(context).platformBrightness == Brightness.light
@@ -65,9 +66,7 @@ class MyApp extends StatelessWidget {
           : const SafeArea(
               child: AuthProvider(),
             ),
-      
       debugShowCheckedModeBanner: false,
-      
     );
   }
 }

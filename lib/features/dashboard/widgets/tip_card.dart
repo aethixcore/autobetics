@@ -45,7 +45,8 @@ class TipCard extends StatelessWidget {
                 child: ClipRRect(
                   borderRadius: BorderRadius.circular(10), //clips radius
                   child: Image.network(
-                    "https://picsum.photos/200",
+                    "https://picsum.photos/100",
+                    fit: BoxFit.fitWidth,
                     loadingBuilder: (context, child, progress) {
                       if (progress == null) return child;
                       return const CircularProgressIndicator();
@@ -53,7 +54,7 @@ class TipCard extends StatelessWidget {
                     errorBuilder: (context, error, stackTrace) {
                       return const Text('Error loading image');
                     },
-                    scale: 0.5,
+                    // scale: 0.5,
                   ),
                 ),
               ),

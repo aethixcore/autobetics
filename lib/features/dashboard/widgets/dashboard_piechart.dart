@@ -26,7 +26,7 @@ class DashboardPieChartState extends State {
     return AspectRatio(
       aspectRatio: 1.3,
       child: Container(
-        decoration: BoxDecoration(),
+        decoration: const BoxDecoration(),
         child: Stack(children: [
           PieChart(
             PieChartData(

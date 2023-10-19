@@ -1,3 +1,5 @@
+// ignore_for_file: library_private_types_in_public_api
+
 import 'package:flutter/material.dart';
 
 class ProfileScreen extends StatelessWidget {
@@ -38,8 +40,8 @@ class ProfileScreen extends StatelessWidget {
               Stack(
                 children: [
                   // Second Section (Goals, Achievements, Badges)
-                  Card(
-                    shape: const RoundedRectangleBorder(
+                  const Card(
+                    shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.all(
                         // Rounded top left corner
                         Radius.circular(20), // Rounded top right corner
@@ -47,13 +49,13 @@ class ProfileScreen extends StatelessWidget {
                     ),
                     child: Column(
                       children: [
-                        const ListTile(
+                        ListTile(
                           title: Text('Goals & Achievements',
                               style: TextStyle(fontWeight: FontWeight.bold)),
                         ),
                         ExpansionTile(
                           // Collapsible section for Goals
-                          title: const Text('Goals'),
+                          title: Text('Goals'),
                           children: [
                             EditableListItem(
                               title: 'Goal 1: Description of Goal 1',
@@ -63,7 +65,7 @@ class ProfileScreen extends StatelessWidget {
                         ),
                         ExpansionTile(
                           // Collapsible section for Achievements
-                          title: const Text('Achievements'),
+                          title: Text('Achievements'),
                           children: [
                             EditableListItem(
                               title:
@@ -102,7 +104,7 @@ class ProfileScreen extends StatelessWidget {
 class EditableListItem extends StatefulWidget {
   final String title;
 
-  EditableListItem({super.key, required this.title});
+  const EditableListItem({super.key, required this.title});
 
   @override
   _EditableListItemState createState() => _EditableListItemState();

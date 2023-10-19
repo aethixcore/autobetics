@@ -1,5 +1,6 @@
 import 'dart:math';
 
+import 'package:autobetics/utils/show_first_time_notification.dart';
 import 'package:flutter/material.dart';
 import 'package:icons_plus/icons_plus.dart';
 import 'package:animated_notch_bottom_bar/animated_notch_bottom_bar/animated_notch_bottom_bar.dart';
@@ -19,6 +20,8 @@ class DashboardWithBottomNav extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    
+    showFirstTimeNotification(context);
     final appData = Provider.of<AppModel>(context);
     final tabColor =
         MediaQuery.of(context).platformBrightness == Brightness.light

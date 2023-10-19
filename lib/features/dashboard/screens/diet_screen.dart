@@ -5,20 +5,20 @@ class DietScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return SingleChildScrollView(
+    return const SingleChildScrollView(
         child: Padding(
-      padding: const EdgeInsets.all(16.0),
+      padding: EdgeInsets.all(16.0),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: <Widget>[
-          const Text(
+          Text(
             'Recommended Diet Plans:',
             style: TextStyle(
               fontSize: 20,
               fontWeight: FontWeight.bold,
             ),
           ),
-          const SizedBox(height: 10),
+          SizedBox(height: 10),
           DietPlanItem(
             title: 'Low-Carb Diet',
             description:
@@ -47,7 +47,7 @@ class DietPlanItem extends StatelessWidget {
   final String description;
   final String imageUrl; // Add an imageUrl field for the image preview.
 
-  DietPlanItem({
+  const DietPlanItem({super.key, 
     required this.title,
     required this.description,
     required this.imageUrl, // Pass the image URL when creating a DietPlanItem.
@@ -57,14 +57,14 @@ class DietPlanItem extends StatelessWidget {
   Widget build(BuildContext context) {
     return Card(
       elevation: 2.0,
-      margin: EdgeInsets.symmetric(vertical: 8.0),
+      margin: const EdgeInsets.symmetric(vertical: 8.0),
       child: ListTile(
-        title: Text(title, style: TextStyle(fontWeight: FontWeight.bold)),
+        title: Text(title, style: const TextStyle(fontWeight: FontWeight.bold)),
         subtitle: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: <Widget>[
             Text(description),
-            SizedBox(height: 8.0),
+            const SizedBox(height: 8.0),
             Image.network(
               imageUrl,
               height: 100, // Adjust the height as needed.
