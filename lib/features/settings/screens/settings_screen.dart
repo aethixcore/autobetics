@@ -14,26 +14,27 @@ class SettingsScreen extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: <Widget>[
-            const Text(
-              'General Settings',
-              style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
-            ),
-            SwitchListTile(
-              title: const Text('Enable Notifications'),
-              value: true, // Replace with your logic
-              onChanged: (bool value) {
-                // Implement your logic here
-              },
-            ),
-            ListTile(
-              title: const Text('Units'),
-              subtitle: const Text('Change units of measurement'),
-              trailing: const Icon(Icons.arrow_forward),
-              onTap: () {
-                // Navigate to units settings
-              },
-            ),
-            const Divider(),
+            /* === upcoming === */
+            // const Text(
+            //   'General Settings',
+            //   style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+            // ),
+            // SwitchListTile(
+            //   title: const Text('Enable Notifications'),
+            //   value: true, // Replace with your logic
+            //   onChanged: (bool value) {
+            //     // Implement your logic here
+            //   },
+            // ),
+            // ListTile(
+            //   title: const Text('Units'),
+            //   subtitle: const Text('Change units of measurement'),
+            //   trailing: const Icon(Icons.arrow_forward),
+            //   onTap: () {
+            //     // Navigate to units settings
+            //   },
+            // ),
+            // const Divider(),
             const Text(
               'Account',
               style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),

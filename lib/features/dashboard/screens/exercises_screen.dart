@@ -1,25 +1,85 @@
-import 'package:flutter/material.dart';
+import 'dart:math';
 
-class ExercisesScreen extends StatelessWidget {
+import 'package:autobetics/utils/choose_exercise_type.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'package:http/http.dart' as http;
+import 'dart:convert';
+
+class ExercisesScreen extends StatefulWidget {
   const ExercisesScreen({super.key});
 
   @override
+  State<ExercisesScreen> createState() => _ExercisesScreenState();
+}
+
+class _ExercisesScreenState extends State<ExercisesScreen> {
+  List exercises = []; // This will store the fetched exercise data.
+  bool isLoading = true;
+  String error = '';
+
+  @override
+  void initState() {
+    super.initState();
+    fetchData();
+  }
+
+  Future<void> fetchData() async {
+    final apiEndpoint =
+        Uri.parse('https://api.api-ninjas.com/v1/exercises?muscle=muscle');
+    print("api $apiEndpoint");
+    try {
+      final uri = Uri.parse(
+          'https://api.api-ninjas.com/v1/exercises?type=${chooseExerciseType(30, 39)}');
+      final response =
+          await http.get(uri, headers: {'X-Api-Key': dotenv.get("NINJA_KEY")});
+      if (response.statusCode == 200) {
+        setState(() {
+          exercises = json.decode(response.body);
+          isLoading = false;
+          print('Status code: ${response.statusCode}');
+          print('Response body: ${exercises}');
+        });
+      } else {
+        setState(() {
+          error = 'Failed to load data. Please try again later.';
+          isLoading = false;
+        });
+      }
+    } catch (e) {
+      print(e);
+      setState(() {
+        error = 'An error occurred. Please check your internet connection.';
+        isLoading = false;
+      });
+    }
+  }
+
+  @override
   Widget build(BuildContext context) {
-    return const Scaffold(
+    return Scaffold(
+      appBar: AppBar(
+        title: Text(
+          'Exercises',
+          style: TextStyle(
+            fontSize: 20,
+            fontWeight: FontWeight.bold,
+          ),
+        ),
+      ),
       body: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: <Widget>[
-          Padding(
-            padding: EdgeInsets.all(16),
-            child: Text(
-              'Exercise Categories',
-              style: TextStyle(
-                fontSize: 24,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-          ),
-          CategoryList(), // Display a list of exercise categories.
+          if (isLoading) // Loading State
+            const Center(
+              child: CircularProgressIndicator(),
+            )
+          else if (error.isNotEmpty) // Error State
+            Center(
+              child: Text(error),
+            )
+          else // Data Fetched
+            CategoryList(exercises: exercises),
         ],
       ),
     );
@@ -27,52 +87,33 @@ class ExercisesScreen extends StatelessWidget {
 }
 
 class CategoryList extends StatelessWidget {
-  const CategoryList({super.key});
+  const CategoryList({super.key, required this.exercises});
+  final List exercises;
 
   @override
   Widget build(BuildContext context) {
+    final int idx = Random().nextInt(1000);
     return Expanded(
-      child: ListView(
-        children: const <Widget>[
-          CategoryItem(
-            title: 'Cardiovascular',
-            exercises: [
-              ExerciseItem(
-                title: 'Running',
-                description: 'Run for at least 30 minutes daily.',
-                imageUrl: 'https://picsum.photos/200',
-              ),
-              ExerciseItem(
-                title: 'Cycling',
-                description: 'Cycling is great for cardiovascular health.',
-                imageUrl: 'https://picsum.photos/200',
-              ),
-              // Add more exercise items for this category.
-            ],
-          ),
-          CategoryItem(
-            title: 'Strength Training',
-            exercises: [
-              ExerciseItem(
-                title: 'Push-Ups',
-                description: 'Do 3 sets of 10 push-ups each day.',
-                imageUrl: 'https://picsum.photos/200',
-              ),
-              ExerciseItem(
-                title: 'Squats',
-                description: 'Squats help build leg muscles.',
-                imageUrl: 'https://picsum.photos/200',
-              ),
-              // Add more exercise items for this category.
-            ],
-          ),
-          // Add more exercise categories here.
-        ],
+      child: ListView.builder(
+        itemCount: exercises.length, // Use the length of the exercises list
+        itemBuilder: (BuildContext context, index) {
+          final exercise = exercises[index];
+          return Card(
+            margin: const EdgeInsets.symmetric(vertical: 5),
+            child: ExerciseItem(
+              title: exercise["name"],
+              description: exercise["instructions"],
+              imageUrl:
+                  'https://picsum.photos/100/${Random().nextInt(exercises.length * 100)}',
+            ),
+          );
+        },
       ),
     );
   }
 }
 
+/* 
 class CategoryItem extends StatelessWidget {
   final String title;
   final List<ExerciseItem> exercises;
@@ -116,7 +157,7 @@ class CategoryItem extends StatelessWidget {
     );
   }
 }
-
+ */
 class ExerciseItem extends StatelessWidget {
   final String title;
   final String description;
@@ -131,24 +172,31 @@ class ExerciseItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return ListTile(
-      leading: Container(
-        width: 60.0,
-        height: 60.0,
-        decoration: BoxDecoration(
-          image: DecorationImage(
-            image: NetworkImage(imageUrl), // Exercise image URL.
-            fit: BoxFit.cover,
+    return Column(
+      children: [
+        ListTile(
+          title: Text(title),
+          leading: Container(
+            width: 60.0,
+            height: 60.0,
+            decoration: BoxDecoration(
+              image: DecorationImage(
+                image: NetworkImage(imageUrl), // Exercise image URL.
+                fit: BoxFit.cover,
+              ),
+              borderRadius: BorderRadius.circular(10.0),
+            ),
           ),
-          borderRadius: BorderRadius.circular(10.0),
+          onTap: () {
+            // Implement navigation to a detailed exercise screen.
+            // You can show exercise details, videos, and more.
+          },
         ),
-      ),
-      title: Text(title),
-      subtitle: Text(description),
-      onTap: () {
-        // Implement navigation to a detailed exercise screen.
-        // You can show exercise details, videos, and more.
-      },
+        Padding(
+          padding: const EdgeInsets.all(12.0),
+          child: Text(description),
+        ),
+      ],
     );
   }
 }

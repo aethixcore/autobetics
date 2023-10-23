@@ -1,3 +1,4 @@
+import 'package:autobetics/features/notification/screens/notification_screen.dart';
 import 'package:flutter/material.dart';
 
 class StoriesAppBar extends StatelessWidget implements PreferredSizeWidget {
@@ -29,34 +30,39 @@ class StoriesAppBar extends StatelessWidget implements PreferredSizeWidget {
           ),
         ),
         actions: [
+        // IconButton(
+        //   onPressed: () {
+        //     // Add your search functionality here
+        //   },
+        //   icon: const Icon(
+        //     Icons.search,
+        //     size: 28,
+        //   ),
+        // ),
           IconButton(
             onPressed: () {
-              // Add your search functionality here
-            },
-            icon: const Icon(
-              Icons.search,
-              size: 28,
-            ),
-          ),
-          IconButton(
-            onPressed: () {
-              // Add your notifications functionality here
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => const NotificationScreen(),
+              ),
+            );
             },
             icon: const Icon(
               Icons.notifications,
               size: 28,
             ),
           ),
-          IconButton(
-            onPressed: () {
-              // Add your user profile functionality here
-            },
-            icon: const CircleAvatar(
-              backgroundImage: NetworkImage(
-                'https://picsum.photos/100', // Replace with user profile image URL
-              ),
-            ),
-          ),
+        // IconButton(
+        //   onPressed: () {
+        //     // Add your user profile functionality here
+        //   },
+        //   icon: const CircleAvatar(
+        //     backgroundImage: NetworkImage(
+        //       'https://picsum.photos/100', // Replace with user profile image URL
+        //     ),
+        //   ),
+        // ),
         ],
       );
   }

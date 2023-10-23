@@ -1,12 +1,26 @@
 // ignore_for_file: library_private_types_in_public_api
-
+import 'package:appwrite/appwrite.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'package:image_picker/image_picker.dart';
+import 'package:autobetics/apis/apis.dart';
+import 'package:autobetics/constants/constants.dart';
+import 'package:autobetics/models/app_model.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
-class ProfileScreen extends StatelessWidget {
+class ProfileScreen extends StatefulWidget {
   const ProfileScreen({super.key});
 
   @override
+  State<ProfileScreen> createState() => _ProfileScreenState();
+}
+
+class _ProfileScreenState extends State<ProfileScreen> {
+  // final TextEditingController _nameController = TextEditingController();
+  @override
   Widget build(BuildContext context) {
+    final appModel = Provider.of<AppModel>(context, listen: true);
+    print("docs $appModel.dashboardDocs");
     return Scaffold(
       appBar: AppBar(
         title: const Text('User Profile'),
@@ -15,82 +29,142 @@ class ProfileScreen extends StatelessWidget {
         children: [
           Column(
             children: [
-              // First Section (Avatar and Bio Data)
-              Container(
-                color:
-                    Colors.transparent, // Make the background color transparent
-                child: Stack(
-                  alignment: Alignment
-                      .bottomRight, // Align the upload icon to the bottom right
-                  children: [
-                    const CircleAvatar(
-                      backgroundImage: NetworkImage('your_avatar_url_here'),
-                      radius: 70, // Adjust the size as needed
-                    ),
-                    IconButton(
-                      icon: const Icon(Icons.camera_alt),
-                      onPressed: () {
-                        // Add your logic to handle image upload here
-                      },
-                    ),
-                  ],
-                ),
+              const SizedBox(
+                height: 20,
               ),
-
+              // Container(
+              //   color:
+              //       Colors.transparent, // Make the background color transparent
+              //   child: Stack(
+              //     alignment: Alignment
+              //         .bottomRight, // Align the upload icon to the bottom right
+              //     children: [
+              //       const CircleAvatar(
+              //         backgroundColor: Colors.grey,
+              //         backgroundImage: NetworkImage('your_avatar_url_here'),
+              //         radius: 70, // Adjust the size as needed
+              //       ),
+              //       IconButton(
+              //         icon: const Icon(Icons.camera_alt),
+              //         onPressed: () {
+                        
+              //         },
+              //       ),
+              //     ],
+              //   ),
+              // ),
               Stack(
                 children: [
-                  // Second Section (Goals, Achievements, Badges)
-                  const Card(
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.all(
-                        // Rounded top left corner
-                        Radius.circular(20), // Rounded top right corner
+                  Column(
+                    children: [
+                      const SizedBox(
+                        height: 50,
                       ),
-                    ),
-                    child: Column(
-                      children: [
-                        ListTile(
-                          title: Text('Goals & Achievements',
-                              style: TextStyle(fontWeight: FontWeight.bold)),
+                      Card(
+                        shape: const RoundedRectangleBorder(
+                          borderRadius: BorderRadius.all(
+                            // Rounded top left corner
+                            Radius.circular(20), // Rounded top right corner
+                          ),
                         ),
-                        ExpansionTile(
-                          // Collapsible section for Goals
-                          title: Text('Goals'),
-                          children: [
-                            EditableListItem(
-                              title: 'Goal 1: Description of Goal 1',
-                            ),
-                            // Add more goals as needed
-                          ],
-                        ),
-                        ExpansionTile(
-                          // Collapsible section for Achievements
-                          title: Text('Achievements'),
-                          children: [
-                            EditableListItem(
-                              title:
-                                  'Achievement 1: Description of Achievement 1',
-                            ),
-                            // Add more achievements as needed
-                          ],
-                        ),
-                        // Add more collapsible sections as needed
-                      ],
-                    ),
-                  ),
-                  Card(
-                    margin: const EdgeInsets.symmetric(horizontal: 20),
-                    child: ListTile(
-                      title: const Text('Your Name'),
-                      subtitle: const Text('Age: XX | Gender: XX'),
-                      trailing: IconButton(
-                        icon: const Icon(Icons.edit),
-                        onPressed: () {
-                          // Implement edit bio data logic here
-                        },
+                        child: Column(children: [
+                          const SizedBox(
+                            height: 20,
+                          ),
+                          const ListTile(
+                            title: Text('Goals & Achievements',
+                                style: TextStyle(fontWeight: FontWeight.bold)),
+                          ),
+                          ExpansionTile(
+                            title: Text("Goals"),
+                            children: appModel.dashboardDocs.isNotEmpty
+                                ? List<Widget>.generate(
+                                    appModel.dashboardDocs["goals"].length,
+                                    (index) {
+                                    return ListTile(
+                                      title: Text(appModel
+                                          .dashboardDocs["goals"][index]),
+                                    );
+                                  })
+                                : [],
+                          ),
+                        ]),
                       ),
-                    ),
+                    ],
                   ),
+                  Column(
+                    children: [
+                      const SizedBox(height: 20),
+                      Card(
+                        margin: const EdgeInsets.symmetric(horizontal: 20),
+                        child: ListTile(
+                          title: const Text('Your Name'),
+                          subtitle: Text(appModel.userInformation.name),
+                          /*   trailing: IconButton(
+                            icon: const Icon(Icons.edit),
+                            onPressed: () {
+                              // Show a dialog for changing the name
+                              showDialog(
+                                context: context,
+                                builder: (BuildContext context) {
+                                  _nameController.text =
+                                      appModel.userInformation.name;
+                                  return AlertDialog(
+                                    title: const Text('Edit Your Name'),
+                                    content: TextFormField(
+                                      controller: _nameController,
+                                    ),
+                                    actions: [
+                                      TextButton(
+                                        onPressed: () {
+                                          Navigator.of(context).pop();
+                                        },
+                                        child: const Text('Cancel'),
+                                      ),
+                                      TextButton(
+                                        onPressed: () async {
+                                          // Update the name in the AppModel
+                                          final authAPI =
+                                              AuthAPI(account: autobetAccount);
+                                          final result =
+                                              await authAPI.updateName(
+                                            name: _nameController.text,
+                                          );
+                                          result.fold((error) {
+                                            ScaffoldMessenger.of(context)
+                                                .showSnackBar(
+                                              SnackBar(
+                                                content: Text(error.message),
+                                              ),
+                                            );
+                                            Navigator.of(context).pop();
+                                          }, (account) {
+                                            appModel.userInformation = account;
+                                            appModel
+                                                .setUserInformation(account);
+                                            ScaffoldMessenger.of(context)
+                                                .showSnackBar(
+                                              SnackBar(
+                                                content: Text(
+                                                    "$account.name updated successfully!"),
+                                              ),
+                                            );
+                                            Navigator.of(context).pop();
+                                          });
+                                        },
+                                        child: const Text('Save'),
+                                      ),
+                                    ],
+                                  );
+                                },
+                              );
+                            },
+                          ),
+                       */
+                        ),
+                      ),
+                    ],
+                  )
                 ],
               )
             ],
@@ -161,10 +235,10 @@ class _EditableListItemState extends State<EditableListItem> {
   Widget build(BuildContext context) {
     return ListTile(
       title: Text(_editedTitle),
-      trailing: IconButton(
-        icon: const Icon(Icons.edit),
-        onPressed: _openEditDialog,
-      ),
+      // trailing: IconButton(
+      //   icon: const Icon(Icons.edit),
+      //   onPressed: _openEditDialog,
+      // ),
     );
   }
 }

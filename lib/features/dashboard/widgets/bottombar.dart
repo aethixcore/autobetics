@@ -21,7 +21,7 @@ class DashboardWithBottomNav extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     
-    showFirstTimeNotification(context);
+    // showFirstTimeNotification(context);
     final appData = Provider.of<AppModel>(context);
     final tabColor =
         MediaQuery.of(context).platformBrightness == Brightness.light

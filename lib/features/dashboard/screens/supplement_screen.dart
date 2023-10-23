@@ -8,7 +8,8 @@ class SupplementScreen extends StatefulWidget {
 }
 
 class _SupplementScreenState extends State<SupplementScreen> {
-  final TextEditingController _supplementNameController = TextEditingController();
+  final TextEditingController _supplementNameController =
+      TextEditingController();
 
   void _showAddSupplementModal(BuildContext context) {
     showModalBottomSheet(
@@ -56,68 +57,74 @@ class _SupplementScreenState extends State<SupplementScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return SafeArea(
-      bottom: false,
-      child: Scaffold(
-        body: Padding(
-          padding: const EdgeInsets.all(16.0),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: <Widget>[
-              const Text(
-                'Your Supplements:',
-                style: TextStyle(
-                  fontSize: 20,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-              const SizedBox(height: 10),
-              FloatingActionButton(
-                isExtended: true,
-                onPressed: () {
-                  // Implement adding new supplements functionality.
-                  _showAddSupplementModal(context);
-                },
-                child: const Icon(Icons.add),
-              ),
-              const SupplementItem(
-                name: 'Vitamin C',
-                dosage: '1000mg',
-                frequency: 'Once daily',
-              ),
-              const SupplementItem(
-                name: 'Fish Oil',
-                dosage: '500mg',
-                frequency: 'Twice daily',
-              ),
-              Expanded(
-                child: ListView(
-                  padding: const EdgeInsets.all(16.0),
-                  children: const <Widget>[
-                    RecommendedSupplementItem(
-                      name: 'Vitamin D',
-                      description: 'Supports bone health and immunity.',
-                      imageUrl: 'https:/picsum.photos/200',
-                    ),
-                    RecommendedSupplementItem(
-                      name: 'Omega-3 Fatty Acids',
-                      description: 'Promotes heart and brain health.',
-                      imageUrl: 'https:/picsum.photos/200',
-                    ),
-                    RecommendedSupplementItem(
-                      name: 'Probiotics',
-                      description: 'Improves gut health and digestion.',
-                      imageUrl: 'https:/picsum.photos/200',
-                    ),
-                    // Add more RecommendedSupplementItem widgets for additional supplements.
-                  ],
-                ),
-              ),
-            ],
+    return Scaffold(
+      appBar: AppBar(
+        title: Text(
+          'Supplements',
+          style: TextStyle(
+            fontSize: 20,
+            fontWeight: FontWeight.bold,
           ),
         ),
-        extendBody: false,
       ),
+      body: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: <Widget>[
+            const Text(
+              'Your Supplements:',
+              style: TextStyle(
+                fontSize: 20,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+            const SizedBox(height: 10),
+            FloatingActionButton(
+              isExtended: true,
+              onPressed: () {
+                // Implement adding new supplements functionality.
+                _showAddSupplementModal(context);
+              },
+              child: const Icon(Icons.add),
+            ),
+            const SupplementItem(
+              name: 'Vitamin C',
+              dosage: '1000mg',
+              frequency: 'Once daily',
+            ),
+            const SupplementItem(
+              name: 'Fish Oil',
+              dosage: '500mg',
+              frequency: 'Twice daily',
+            ),
+            Expanded(
+              child: ListView(
+                padding: const EdgeInsets.all(16.0),
+                children: const <Widget>[
+                  RecommendedSupplementItem(
+                    name: 'Vitamin D',
+                    description: 'Supports bone health and immunity.',
+                    imageUrl: 'https:/picsum.photos/200',
+                  ),
+                  RecommendedSupplementItem(
+                    name: 'Omega-3 Fatty Acids',
+                    description: 'Promotes heart and brain health.',
+                    imageUrl: 'https:/picsum.photos/200',
+                  ),
+                  RecommendedSupplementItem(
+                    name: 'Probiotics',
+                    description: 'Improves gut health and digestion.',
+                    imageUrl: 'https:/picsum.photos/200',
+                  ),
+                  // Add more RecommendedSupplementItem widgets for additional supplements.
+                ],
+              ),
+            ),
+          ],
+        ),
+      ),
+      extendBody: false,
     );
   }
 }
@@ -127,7 +134,8 @@ class RecommendedSupplementItem extends StatelessWidget {
   final String description;
   final String imageUrl;
 
-  const RecommendedSupplementItem({super.key, 
+  const RecommendedSupplementItem({
+    super.key,
     required this.name,
     required this.description,
     required this.imageUrl,

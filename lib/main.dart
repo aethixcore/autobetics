@@ -1,3 +1,5 @@
+import 'package:autobetics/models/auth_model.dart';
+import 'package:autobetics/models/onboarding_model.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -11,9 +13,12 @@ GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
 void main() async {
   await dotenv.load(fileName: ".env");
 
-  runApp(ChangeNotifierProvider(
-    lazy: true,
-    create: (context) => AppModel(),
+  runApp(MultiProvider(
+    providers: [
+      ChangeNotifierProvider(create: (context) => AppModel()),
+      ChangeNotifierProvider(create: (context) => AuthModel()),
+      ChangeNotifierProvider(create: (context) => OnBoardingModel()),
+    ],
     child: const MyApp(),
   ));
 }

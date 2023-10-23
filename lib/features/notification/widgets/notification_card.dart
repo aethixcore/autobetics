@@ -4,6 +4,7 @@ Widget buildNotificationCard({
   required String title,
   required String description,
   required IconData icon,
+  required void Function()? onTap
 }) {
   return Card(
     elevation: 2.0,
@@ -27,10 +28,7 @@ Widget buildNotificationCard({
         Icons.arrow_forward_ios,
         size: 20.0,
       ),
-      onTap: () {
-        // Add functionality to navigate to a detailed notification screen
-        // or perform the corresponding action for the notification.
-      },
+      onTap: onTap,
     ),
   );
 }

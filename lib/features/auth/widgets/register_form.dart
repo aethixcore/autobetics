@@ -1,11 +1,11 @@
 // ignore_for_file: prefer_const_constructors_in_immutables, use_build_context_synchronously
 
-
 import 'package:autobetics/apis/apis.dart';
 import 'package:autobetics/constants/constants.dart';
 import 'package:autobetics/models/app_model.dart';
 import 'package:autobetics/models/auth_model.dart';
 import 'package:autobetics/providers/auth_provider.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
 import 'package:provider/provider.dart';
@@ -26,16 +26,29 @@ class _RegisterationFormState extends State<RegisterationForm> {
     final appModel = Provider.of<AppModel>(context, listen: true);
     void handleSubmit() async {
       if (_formKey.currentState!.validate()) {
+        authModel.loading = true;
         authModel.updateLoading(true);
-      
+
         final accountAPI = AuthAPI(account: autobetAccount);
-        accountAPI
-            .signUp(
-                email: authModel.emailController.text,
-                password: authModel.passwordController.text,
-                name: authModel.nameController.text)
-            .whenComplete(() {
+        final result = await accountAPI.signUp(
+            email: authModel.emailController.text,
+            password: authModel.passwordController.text,
+            name: authModel.nameController.text);
+
+        result.fold((l) {
+          authModel.updateLoading(false);
+          authModel.loading = true;
+          ScaffoldMessenger.of(context)
+              .showSnackBar(SnackBar(content: Text(l.message)));
+        }, (r) {
+          if (kDebugMode) {
+            print(r);
+          }
           authModel.reset();
+          authModel.loading = true;
+          authModel.updateLoading(false);
+          ScaffoldMessenger.of(context).showSnackBar(
+              const SnackBar(content: Text("Successfully registered!")));
           authModel.updateLoading(false);
           appModel.firstTime = false;
           appModel.freshLauched = false;

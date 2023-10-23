@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:icons_plus/icons_plus.dart';
 
 class StoryFeed extends StatelessWidget {
   final String username;
@@ -16,49 +15,70 @@ class StoryFeed extends StatelessWidget {
     required this.postText,
     required this.postImageUrl,
   });
+
   @override
   Widget build(BuildContext context) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.stretch,
-      children: [
-        const SizedBox(width: 12),
-        Row(
-          children: [
-            CircleAvatar(
-              radius: 24,
-              backgroundImage: NetworkImage(profileImageUrl),
-            ),
-            const SizedBox(width: 12),
-            Text(
-              username,
-              style: const TextStyle(
-                fontWeight: FontWeight.bold,
-                fontSize: 16,
+    return Container(
+      margin: const EdgeInsets.all(12),
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(12),
+        image: DecorationImage(
+          image: NetworkImage(postImageUrl),
+          fit: BoxFit.cover,
+        ),
+      ),
+      child: Stack(
+        children: [
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              const SizedBox(height: 12),
+              CircleAvatar(
+                radius: 24,
+                backgroundImage: NetworkImage(profileImageUrl),
+              ),
+              const SizedBox(height: 12),
+              Text(
+                username,
+                style: const TextStyle(
+                  fontWeight: FontWeight.bold,
+                  fontSize: 16,
+                ),
+              ),
+              const SizedBox(height: 8),
+              Text(
+                postText,
+                style: const TextStyle(fontSize: 14),
+              ),
+            ],
+          ),
+          Positioned(
+            bottom: 12,
+            left: 12,
+            right: 12,
+            child: Container(
+              decoration: BoxDecoration(
+                color: Colors.black.withOpacity(0.5),
+                borderRadius: BorderRadius.circular(12),
+              ),
+              padding: const EdgeInsets.all(8),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    postHeading,
+                    style: const TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  // Add your time and source here
+                ],
               ),
             ),
-          ],
-        ),
-        Text(
-          postText,
-          style: const TextStyle(),
-        ),
-        const SizedBox(height: 8),
-        Image.network(postImageUrl, height: 250, fit: BoxFit.fitWidth),
-        const SizedBox(height: 12),
-        Stack(
-          children: [
-            IconButton.filled(
-                onPressed: () {}, icon: const Icon(EvaIcons.activity)),
-            Text(
-              postHeading,
-              style: const TextStyle(
-                  fontSize: 16,
-                  fontWeight: FontWeight.bold,
-                  shadows: [BoxShadow()]),
-            ),
-          ],
-        )
-      ],
+          ),
+        ],
+      ),
     );
   }
 }

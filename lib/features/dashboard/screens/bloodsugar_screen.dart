@@ -56,22 +56,27 @@ class _BloodSugarScreenState extends State<BloodSugarScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      resizeToAvoidBottomInset: false,
+      appBar: AppBar(
+        title: Text(
+          'Blood Sugar',
+          style: TextStyle(
+            fontSize: 20,
+            fontWeight: FontWeight.bold,
+          ),
+        ),
+      ),
+    
       body: SingleChildScrollView(
         child: Container(
           padding: const EdgeInsets.symmetric(horizontal: 16),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const Text(
-                'Blood Sugar:',
-                style: TextStyle(
-                  fontSize: 20,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
+            
               const SizedBox(height: 10),
-              AnimatedContainer(
+
+              /* === not needed === */
+              /*   AnimatedContainer(
                 duration: const Duration(milliseconds: 1000),
                 height: 200,
                 child: LineChart(
@@ -110,9 +115,9 @@ class _BloodSugarScreenState extends State<BloodSugarScreen> {
                   ),
                 ),
               ),
-              const Text('Select Date and Time for Reading:'),
-              const SizedBox(height: 20),
-              Row(
+              // const Text('Select Date and Time for Reading:'),
+              const SizedBox(height: 20), */
+              /*   Row(
                 children: [
                   Expanded(
                     child: ListTile(
@@ -138,7 +143,8 @@ class _BloodSugarScreenState extends State<BloodSugarScreen> {
                   ),
                 ],
               ),
-              const SizedBox(height: 10),
+             */
+              // const SizedBox(height: 10),
               Row(
                 children: [
                   Expanded(
@@ -257,7 +263,12 @@ class RecommendationItem extends StatelessWidget {
         children: [
           const Icon(Icons.check_circle, color: Colors.green),
           const SizedBox(width: 10),
-          Text(text),
+          Flexible(
+            child: Text(
+              text,
+              softWrap: true,
+            ),
+          ),
         ],
       ),
     );

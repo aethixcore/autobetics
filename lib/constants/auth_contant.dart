@@ -5,4 +5,5 @@ Client autobetClient = Client()
     .setEndpoint(dotenv.get("APPWRITE_ENDPOINT"))
     .setProject(dotenv.get("APPWRITE_PID"));
 Account autobetAccount = Account(autobetClient);
-Databases autobetDatabese = Databases(autobetClient);
+Databases autobetDatabase = Databases(autobetClient);
+Storage autobetStorage = Storage(autobetClient);

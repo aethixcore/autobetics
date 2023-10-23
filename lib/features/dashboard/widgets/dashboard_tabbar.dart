@@ -1,3 +1,6 @@
+import 'package:appwrite/models.dart';
+import 'package:autobetics/apis/auth_api.dart';
+import 'package:autobetics/constants/constants.dart';
 import 'package:autobetics/features/dashboard/screens/bloodsugar_screen.dart';
 import 'package:autobetics/features/dashboard/screens/diet_screen.dart';
 import 'package:autobetics/features/dashboard/screens/exercises_screen.dart';
@@ -8,6 +11,7 @@ import 'package:autobetics/features/profile/profile_screen.dart';
 import 'package:autobetics/features/settings/screens/settings_screen.dart';
 import 'package:autobetics/models/app_model.dart';
 import 'package:autobetics/features/dashboard/screens/home_screen.dart';
+import 'package:autobetics/providers/auth_provider.dart';
 import 'package:autobetics/utils/app_colors.dart';
 import 'package:autobetics/features/dashboard/widgets/greeting.dart';
 import 'package:flutter/gestures.dart';
@@ -34,12 +38,26 @@ class DashboardTabbar extends StatefulWidget {
 class _DashboardTabbarState extends State<DashboardTabbar>
     with SingleTickerProviderStateMixin {
   late TabController _tabController;
+  Account? _user;
 
   @override
   void initState() {
     super.initState();
-    _tabController = TabController(
-        length: 6, vsync: this); // Specify the vsync parameter here.
+    _tabController = TabController(length: 6, vsync: this);
+    // Load user data only if it's not already loaded
+    if (_user == null) {
+      loadUserData();
+    }
+  }
+
+  Future<void> loadUserData() async {
+    final api = AuthAPI(account: autobetAccount);
+    final result = await api.getUser();
+    result.fold((left) {}, (right) {
+      setState(() {
+        _user = right;
+      });
+    });
   }
 
   @override
@@ -50,44 +68,66 @@ class _DashboardTabbarState extends State<DashboardTabbar>
 
   @override
   Widget build(BuildContext context) {
-    final appData = Provider.of<AppModel>(context);
+    final appData = Provider.of<AppModel>(
+      context,
+      listen: true,
+    );
     return DefaultTabController(
       length: 6, // Specify the number of tabs
       child: Scaffold(
         appBar: AppBar(
           toolbarHeight: MediaQuery.sizeOf(context).height * 0.105,
-          leading: Greeting("devRed"),
+          leading:
+              _user != null ? Greeting(appData.userInformation.name) : null,
           leadingWidth: MediaQuery.sizeOf(context).width,
+          /* 
+
+           */
           actions: [
             PopupMenuButton<int>(
-              icon: const Icon(FontAwesome.ellipsis_vertical),
-              itemBuilder: (context) => [
+              icon: Badge(
+                isLabelVisible: appData.showNotificationCount,
+                child: const Icon(FontAwesome.ellipsis_vertical),
+              ),
+              itemBuilder: (context) => <PopupMenuEntry<int>>[
                 const PopupMenuItem<int>(
                   value: 1,
                   child: ListTile(
-                    leading: Icon(Icons.person), // Icon for the Profile screen
-                    title: Text('Profile'), // Text for the menu item
+                    leading: Icon(Icons.person),
+                    title: Text('Profile'),
                   ),
                 ),
-                const PopupMenuItem<int>(
+                PopupMenuItem<int>(
                   value: 2,
                   child: ListTile(
-                    leading: Icon(
-                        Icons.notifications), // Icon for the Settings screen
-                    title: Text('Notifications'), // Text for the menu item
+                    leading: Badge(
+                      // smallSize: 7,
+                      largeSize: 14,
+                      offset: const Offset(-10, -3),
+                      label: Text(appData.notificationCount.toString()),
+                      isLabelVisible: appData.notificationCount > 0,
+                      child: const Icon(Icons.notifications),
+                    ),
+                    title: const Text(
+                        'Notifications'), // Use appData.notificationCount
                   ),
                 ),
                 const PopupMenuItem<int>(
                   value: 3,
                   child: ListTile(
-                    leading:
-                        Icon(Icons.settings), // Icon for the Settings screen
-                    title: Text('Settings'), // Text for the menu item
+                    leading: Icon(Icons.settings),
+                    title: Text('Settings'),
+                  ),
+                ),
+                const PopupMenuItem<int>(
+                  value: 4,
+                  child: ListTile(
+                    leading: Icon(Icons.logout),
+                    title: Text('Logout'),
                   ),
                 ),
               ],
-              onSelected: (value) {
-                // Handle the selected option here
+              onSelected: (value) async {
                 if (value == 1) {
                   Navigator.push(
                     context,
@@ -109,6 +149,23 @@ class _DashboardTabbarState extends State<DashboardTabbar>
                       builder: (context) => const SettingsScreen(),
                     ),
                   );
+                } else if (value == 4) {
+                  final authAPI = AuthAPI(account: autobetAccount);
+                  final result =
+                      await authAPI.logOut(appData.userSession.$id as dynamic);
+                  result.fold((error) {
+                    ScaffoldMessenger.of(context)
+                        .showSnackBar(SnackBar(content: Text(error.message)));
+                  }, (userSession) {
+                    appData.userSession = userSession;
+                    appData.setUserSession(userSession);
+                    Navigator.pushReplacement(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => const AuthProvider(),
+                      ),
+                    );
+                  });
                 }
               },
             )
@@ -147,6 +204,7 @@ class _DashboardTabbarState extends State<DashboardTabbar>
           ),
         ),
         body: TabBarView(
+          clipBehavior: Clip.antiAliasWithSaveLayer,
           controller: _tabController,
           children: const [
             // Content for Tab 1

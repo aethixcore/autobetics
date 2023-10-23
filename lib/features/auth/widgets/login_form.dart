@@ -1,8 +1,11 @@
 // ignore_for_file: prefer_const_constructors_in_immutables, use_build_context_synchronously
+import 'package:appwrite/appwrite.dart';
 import 'package:autobetics/apis/apis.dart';
-import 'package:autobetics/common/loaders.dart';
 import 'package:autobetics/constants/constants.dart';
+import 'package:autobetics/models/app_model.dart';
+import 'package:autobetics/models/onboarding_model.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:provider/provider.dart';
 
 import 'package:autobetics/features/dashboard/widgets/bottombar.dart';
@@ -10,10 +13,12 @@ import 'package:autobetics/models/auth_model.dart';
 
 class LoginForm extends StatefulWidget {
   LoginForm({super.key});
-
   @override
   State<LoginForm> createState() => _LoginFormState();
 }
+
+final accountAPI = AuthAPI(account: autobetAccount);
+final dbAPI = DBAPI(db: autobetDatabase);
 
 class _LoginFormState extends State<LoginForm> {
   final _formKey = GlobalKey<FormState>();
@@ -22,41 +27,80 @@ class _LoginFormState extends State<LoginForm> {
   @override
   Widget build(BuildContext context) {
     final authModel = Provider.of<AuthModel>(context, listen: true);
+    final appModel = Provider.of<AppModel>(context, listen: true);
+    final onboardingModel = Provider.of<OnBoardingModel>(context, listen: true);
     void handleSubmit() async {
       if (_formKey.currentState!.validate()) {
-        final accountAPI = AuthAPI(account: autobetAccount);
-        authModel.updateLoading(true);
-        try {
-          final result = await accountAPI.signIn(
-            email: authModel.emailController.text,
-            password: authModel.passwordController.text,
-          );
+        if (appModel.freshLauched) {
+          final result = await dbAPI.createDocument(
+              uId: ID.unique(),
+              colId: appModel.userInformation.$id,
+              data: {"goals": onboardingModel.selectedGoals});
 
-          // Check the result to determine if the authentication was successful.
-          if (result.isRight()) {
-            // Authentication successful, navigate to the dashboard.
+          appModel.freshLauched = false;
+        }
+
+        authModel.loading = true;
+        authModel.updateLoading(true);
+        final result = await accountAPI.signIn(
+          email: authModel.emailController.text,
+          password: authModel.passwordController.text,
+        );
+        result.fold((error) {
+          authModel.reset();
+          authModel.updateLoading(false);
+          // Show a notification indicating authentication failure.
+          authModel.updateLoading(false);
+
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text(error.message),
+            ),
+          );
+          authModel.emailFocusNode.requestFocus();
+        }, (userSession) async {
+          appModel.userSession = userSession;
+          appModel.setUserSession(userSession);
+          final authAPI = AuthAPI(account: autobetAccount);
+          final result = await authAPI.getUser();
+
+          result.fold((error) {
             authModel.reset();
             authModel.updateLoading(false);
-            Navigator.of(context).pushReplacement(MaterialPageRoute(
-                builder: (context) => DashboardWithBottomNav()));
-          } else {
             // Show a notification indicating authentication failure.
             authModel.updateLoading(false);
+
             ScaffoldMessenger.of(context).showSnackBar(
-              const SnackBar(
-                content: Text(
-                    'Invalid credentials. Please check the email and password.'),
+              SnackBar(
+                content: Text(error.message),
               ),
             );
             authModel.emailFocusNode.requestFocus();
-          }
-        } catch (error) {
-          // Handle other errors here, e.g., network issues.
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(
-              content: Text('An error occurred. Please try again later.'),
-            ),
-          );
+          }, (userInformation) async {
+            //if logging and getting user results is successfuluser
+            print(userInformation);
+            final r = await dbAPI.getDocument(
+                uId: userInformation.$id,
+                colId: dotenv.get("COLLECTION_ID_DASHBOARD"));
+            r.fold((l) => null,
+                (r) => appModel.setDashboardDocs(r)); //set user documnet
+            appModel.userInformation = userInformation;
+            appModel.setUserInformation(userInformation);
+            authModel.reset();
+            authModel.updateLoading(false);
+            if (!userInformation.emailVerification) {
+              appModel.incrementNotificationCount(1);
+            }
+
+            Navigator.of(context).pushReplacement(MaterialPageRoute(
+                builder: (context) => DashboardWithBottomNav()));
+          });
+        });
+        if (result.isRight()) {
+          // Authentication successful, navigate to the dashboard.
+        } else {
+          authModel.reset();
+          authModel.updateLoading(false);
         }
       }
     }
