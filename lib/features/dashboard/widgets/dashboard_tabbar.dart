@@ -1,6 +1,4 @@
-import 'package:appwrite/models.dart';
-import 'package:autobetics/apis/auth_api.dart';
-import 'package:autobetics/constants/constants.dart';
+
 import 'package:autobetics/features/dashboard/screens/bloodsugar_screen.dart';
 import 'package:autobetics/features/dashboard/screens/diet_screen.dart';
 import 'package:autobetics/features/dashboard/screens/exercises_screen.dart';
@@ -11,7 +9,6 @@ import 'package:autobetics/features/profile/profile_screen.dart';
 import 'package:autobetics/features/settings/screens/settings_screen.dart';
 import 'package:autobetics/models/app_model.dart';
 import 'package:autobetics/features/dashboard/screens/home_screen.dart';
-import 'package:autobetics/providers/auth_provider.dart';
 import 'package:autobetics/utils/app_colors.dart';
 import 'package:autobetics/features/dashboard/widgets/greeting.dart';
 import 'package:flutter/gestures.dart';
@@ -38,26 +35,18 @@ class DashboardTabbar extends StatefulWidget {
 class _DashboardTabbarState extends State<DashboardTabbar>
     with SingleTickerProviderStateMixin {
   late TabController _tabController;
-  Account? _user;
+
 
   @override
   void initState() {
     super.initState();
     _tabController = TabController(length: 6, vsync: this);
     // Load user data only if it's not already loaded
-    if (_user == null) {
-      loadUserData();
-    }
+  
   }
 
   Future<void> loadUserData() async {
-    final api = AuthAPI(account: autobetAccount);
-    final result = await api.getUser();
-    result.fold((left) {}, (right) {
-      setState(() {
-        _user = right;
-      });
-    });
+  
   }
 
   @override
@@ -78,7 +67,7 @@ class _DashboardTabbarState extends State<DashboardTabbar>
         appBar: AppBar(
           toolbarHeight: MediaQuery.sizeOf(context).height * 0.105,
           leading:
-              _user != null ? Greeting(appData.userInformation.name) : null,
+             null,
           leadingWidth: MediaQuery.sizeOf(context).width,
           /* 
 
@@ -150,22 +139,7 @@ class _DashboardTabbarState extends State<DashboardTabbar>
                     ),
                   );
                 } else if (value == 4) {
-                  final authAPI = AuthAPI(account: autobetAccount);
-                  final result =
-                      await authAPI.logOut(appData.userSession.$id as dynamic);
-                  result.fold((error) {
-                    ScaffoldMessenger.of(context)
-                        .showSnackBar(SnackBar(content: Text(error.message)));
-                  }, (userSession) {
-                    appData.userSession = userSession;
-                    appData.setUserSession(userSession);
-                    Navigator.pushReplacement(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => const AuthProvider(),
-                      ),
-                    );
-                  });
+                
                 }
               },
             )

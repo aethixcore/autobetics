@@ -1,5 +1,4 @@
-import 'package:autobetics/apis/auth_api.dart';
-import 'package:autobetics/constants/constants.dart';
+
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:autobetics/models/app_model.dart';
@@ -27,11 +26,7 @@ void showFirstTimeNotification(BuildContext context) {
                 ),
                 ElevatedButton(
                   onPressed: () {
-                    // Handle the action when the user taps the "Verify Email" button.
-                    final accountAPI = AuthAPI(account: autobetAccount);
-                    accountAPI.verifyEmail().whenComplete(() {
-                      Navigator.of(context).pop(); // Close the bottom sheet.
-                    });
+                  
                   },
                   child: const Text('Verify Email'),
                 ),

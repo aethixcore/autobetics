@@ -1,9 +1,4 @@
 // ignore_for_file: library_private_types_in_public_api
-import 'package:appwrite/appwrite.dart';
-import 'package:flutter_dotenv/flutter_dotenv.dart';
-import 'package:image_picker/image_picker.dart';
-import 'package:autobetics/apis/apis.dart';
-import 'package:autobetics/constants/constants.dart';
 import 'package:autobetics/models/app_model.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -76,7 +71,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                 style: TextStyle(fontWeight: FontWeight.bold)),
                           ),
                           ExpansionTile(
-                            title: Text("Goals"),
+                            title: const Text("Goals"),
                             children: appModel.dashboardDocs.isNotEmpty
                                 ? List<Widget>.generate(
                                     appModel.dashboardDocs["goals"].length,
@@ -92,14 +87,14 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       ),
                     ],
                   ),
-                  Column(
+                  const Column(
                     children: [
-                      const SizedBox(height: 20),
+                      SizedBox(height: 20),
                       Card(
-                        margin: const EdgeInsets.symmetric(horizontal: 20),
+                        margin: EdgeInsets.symmetric(horizontal: 20),
                         child: ListTile(
-                          title: const Text('Your Name'),
-                          subtitle: Text(appModel.userInformation.name),
+                          title: Text('Your Name'),
+                          subtitle: Text(''),
                           /*   trailing: IconButton(
                             icon: const Icon(Icons.edit),
                             onPressed: () {

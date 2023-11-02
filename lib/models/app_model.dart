@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:animated_notch_bottom_bar/animated_notch_bottom_bar/animated_notch_bottom_bar.dart';
-import "package:appwrite/models.dart" as model;
 import 'package:autobetics/utils/app_colors.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 
 class AppModel extends ChangeNotifier {
   late bool freshLauched = true;
@@ -9,31 +9,38 @@ class AppModel extends ChangeNotifier {
   late Map onboardingData;
   late bool showNotificationCount = false;
   late int notificationCount = 0;
-  late model.Token? phoneToken;
-  late model.Account userInformation;
-  late model.Session userSession;
-  late bool verifiedEmail = userInformation.emailVerification;
+
+  late User? user;
+  late Session? session;
   //dashbord data with goals
   late Map dashboardDocs = {};
-
-  setPhoneToken(token) {
-    phoneToken = token;
+  updateUser(User user) {
+    user = user;
     notifyListeners();
   }
 
-  setDashboardDocs(model.Document document) {
-    dashboardDocs = document.data;
+  updateSession(Session session) {
+    session = session;
+  }
+
+  var _verifyEmail;
+
+  bool get verifiedEmail => _verifyEmail;
+
+  setPhoneToken(token) {
+    notifyListeners();
+  }
+
+  setDashboardDocs() {
     notifyListeners();
   }
 
 //user information
-  setUserInformation(model.Account userInformation) {
-    this.userInformation = userInformation;
+  setUserInformation() {
     notifyListeners();
   }
 
-  setUserSession(model.Session userSession) {
-    this.userSession = userSession;
+  setUserSession() {
     notifyListeners();
   }
 

@@ -1,17 +1,22 @@
+import 'package:autobetics/common/routes.dart';
+import 'package:autobetics/features/onboarding/screens/onboarding.dart';
 import 'package:autobetics/models/auth_model.dart';
 import 'package:autobetics/models/onboarding_model.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-
 import 'package:autobetics/models/app_model.dart';
-import 'package:autobetics/providers/onboarding_provider.dart';
-import 'package:autobetics/providers/auth_provider.dart';
 import 'package:autobetics/utils/app_colors.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 
 GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
 void main() async {
   await dotenv.load(fileName: ".env");
+  await Supabase.initialize(
+    url: dotenv.get("SUPABASE_ENDPOINT"),
+    anonKey: dotenv.get("SUPABASE_KEY"),
+    authFlowType: AuthFlowType.pkce,
+  );
 
   runApp(MultiProvider(
     providers: [
@@ -53,7 +58,6 @@ class MyApp extends StatelessWidget {
   const MyApp({super.key});
   @override
   Widget build(BuildContext context) {
-    final appData = Provider.of<AppModel>(context);
     return MaterialApp(
       // builder: FToastBuilder(),
       // navigatorKey: navigatorKey,
@@ -64,14 +68,9 @@ class MyApp extends StatelessWidget {
                 : darkTheme,
         useMaterial3: true,
       ),
-      home: appData.freshLauched
-          ? const SafeArea(
-              child: OnboardingProvider(),
-            )
-          : const SafeArea(
-              child: AuthProvider(),
-            ),
       debugShowCheckedModeBanner: false,
+      routes: routes,
+      initialRoute: "/check_screen_status",
     );
   }
 }

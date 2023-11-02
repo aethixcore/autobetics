@@ -32,7 +32,7 @@ environment:
 # versions available, run `flutter pub outdated`.
 dependencies:
     # animated_bottom_navigation_bar: ^1.2.0
-    appwrite: ^8.1.0
+    # appwrite: ^8.1.0
     fl_chart: ^0.63.0
     flutter_dotenv: ^5.1.0
     flutter_secure_storage: ^7.0.1
@@ -51,6 +51,8 @@ dependencies:
     fluttertoast: ^8.2.2
     http: ^0.13.6
     image_picker: ^1.0.4
+    supabase_flutter: ^1.10.23
+    shared_preferences: ^2.2.2
 
 dev_dependencies:
     flutter_test:

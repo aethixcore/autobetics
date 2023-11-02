@@ -1,7 +1,6 @@
 // ignore_for_file: library_private_types_in_public_api
 
 import 'package:flutter/material.dart';
-import 'package:fl_chart/fl_chart.dart';
 import 'package:intl/intl.dart';
 
 class BloodSugarScreen extends StatefulWidget {
@@ -57,7 +56,7 @@ class _BloodSugarScreenState extends State<BloodSugarScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(
+        title: const Text(
           'Blood Sugar',
           style: TextStyle(
             fontSize: 20,

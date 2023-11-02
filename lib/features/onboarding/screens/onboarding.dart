@@ -11,15 +11,8 @@ import 'package:autobetics/features/onboarding/widgets/goals_checklist.dart';
 import 'package:autobetics/features/onboarding/widgets/weight_input.dart';
 import 'package:autobetics/features/onboarding/widgets/age_picker.dart';
 
-class OnboardingScreen extends StatefulWidget {
+class OnboardingScreen extends StatelessWidget {
   const OnboardingScreen({super.key});
-
-  @override
-  _OnboardingScreenState createState() => _OnboardingScreenState();
-}
-
-class _OnboardingScreenState extends State<OnboardingScreen> {
-  _OnboardingScreenState();
 
   @override
   Widget build(BuildContext context) {

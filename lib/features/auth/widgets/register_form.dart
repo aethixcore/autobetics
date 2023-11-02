@@ -1,14 +1,12 @@
 // ignore_for_file: prefer_const_constructors_in_immutables, use_build_context_synchronously
 
-import 'package:autobetics/apis/apis.dart';
-import 'package:autobetics/constants/constants.dart';
+import 'package:autobetics/apis/supabase.dart';
 import 'package:autobetics/models/app_model.dart';
 import 'package:autobetics/models/auth_model.dart';
-import 'package:autobetics/providers/auth_provider.dart';
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
 import 'package:provider/provider.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class RegisterationForm extends StatefulWidget {
   RegisterationForm({super.key});
@@ -17,43 +15,40 @@ class RegisterationForm extends StatefulWidget {
   State<RegisterationForm> createState() => _RegisterationFormState();
 }
 
+final subaseAPI = SupaBaseAPI();
+
 class _RegisterationFormState extends State<RegisterationForm> {
   final _formKey = GlobalKey<FormState>();
   bool obscure = true;
   @override
   Widget build(BuildContext context) {
     final authModel = Provider.of<AuthModel>(context, listen: true);
-    final appModel = Provider.of<AppModel>(context, listen: true);
     void handleSubmit() async {
       if (_formKey.currentState!.validate()) {
         authModel.loading = true;
         authModel.updateLoading(true);
-
-        final accountAPI = AuthAPI(account: autobetAccount);
-        final result = await accountAPI.signUp(
-            email: authModel.emailController.text,
-            password: authModel.passwordController.text,
-            name: authModel.nameController.text);
-
-        result.fold((l) {
+        final email = authModel.emailController.text;
+        final password = authModel.passwordController.text;
+        final fullname = authModel.nameController.text;
+        final SharedPreferences prefs = await SharedPreferences.getInstance();
+        prefs.setString("email", email);
+        prefs.setString("fullname", fullname);
+        prefs.setString("password", password);
+        final result = await subaseAPI.signUp(email: email, password: password);
+        result.fold((error) {
+          authModel.loading = false;
           authModel.updateLoading(false);
-          authModel.loading = true;
           ScaffoldMessenger.of(context)
-              .showSnackBar(SnackBar(content: Text(l.message)));
-        }, (r) {
-          if (kDebugMode) {
-            print(r);
-          }
-          authModel.reset();
-          authModel.loading = true;
+              .showSnackBar(SnackBar(content: Text(error.message)));
+        }, (response) {
+          authModel.loading = false;
           authModel.updateLoading(false);
-          ScaffoldMessenger.of(context).showSnackBar(
-              const SnackBar(content: Text("Successfully registered!")));
-          authModel.updateLoading(false);
-          appModel.firstTime = false;
-          appModel.freshLauched = false;
-          Navigator.of(context).pushReplacement(
-              MaterialPageRoute(builder: (context) => const AuthProvider()));
+          prefs.setBool("newUser", true);
+          prefs.setBool("verified", false);
+          ScaffoldMessenger.of(context)
+              .showSnackBar(const SnackBar(content: Text("Success")));
+          Future.delayed(const Duration(milliseconds: 2001));
+          Navigator.pushReplacementNamed(context, "/dashboard");
         });
       }
     }

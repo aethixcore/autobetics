@@ -3,7 +3,7 @@ import 'package:http/http.dart' as http;
 import 'dart:convert';
 
 class DietScreen extends StatefulWidget {
-  const DietScreen({Key? key});
+  const DietScreen({super.key});
 
   @override
   State<DietScreen> createState() => _DietScreenState();

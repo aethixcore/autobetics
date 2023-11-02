@@ -1,12 +1,13 @@
-
 import 'dart:ui' as ui;
 import 'package:autobetics/common/loaders.dart';
 import 'package:autobetics/models/auth_model.dart';
 import 'package:autobetics/features/auth/widgets/login_form.dart';
 import 'package:autobetics/features/auth/widgets/signwith_google.dart';
 import 'package:autobetics/utils/app_colors.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+
 class LoginScreen extends StatelessWidget {
   const LoginScreen({super.key});
 
@@ -48,6 +49,10 @@ class LoginScreen extends StatelessWidget {
                                 style: const TextStyle(
                                     fontSize: 32, letterSpacing: 2.3)),
                           ),
+                          const ListTile(
+                              leading:
+                                  Icon(CupertinoIcons.hand_point_left_fill),
+                              title: Text("Swipe to move to register")),
                           SizedBox(
                             height: 200,
                             child: FractionallySizedBox(

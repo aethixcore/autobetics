@@ -38,7 +38,7 @@ class _ExercisesScreenState extends State<ExercisesScreen> {
           exercises = json.decode(response.body);
           isLoading = false;
           print('Status code: ${response.statusCode}');
-          print('Response body: ${exercises}');
+          print('Response body: $exercises');
         });
       } else {
         setState(() {
@@ -59,7 +59,7 @@ class _ExercisesScreenState extends State<ExercisesScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(
+        title: const Text(
           'Exercises',
           style: TextStyle(
             fontSize: 20,

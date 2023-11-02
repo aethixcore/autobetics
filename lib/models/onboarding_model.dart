@@ -1,11 +1,12 @@
-import 'package:autobetics/models/app_model.dart';
+// ignore_for_file: use_build_context_synchronously
+
+import 'dart:convert';
+
 import 'package:autobetics/utils/app_colors.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-
-import 'package:autobetics/providers/auth_provider.dart';
 import 'package:icons_plus/icons_plus.dart';
-import 'package:provider/provider.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class OnBoardingModel extends ChangeNotifier {
   DateTime age = DateTime.now();
@@ -89,13 +90,12 @@ class OnBoardingModel extends ChangeNotifier {
     notifyListeners();
   }
 
-  void upadateGoals(List goals) {
+  void updateGoals(List goals) {
     goals = goals;
     notifyListeners();
   }
 
   void finishOnboarding(BuildContext context) {
-    final appModel = Provider.of<AppModel>(context, listen: false);
     if (age == DateTime.now()) {
       pageController.jumpToPage(1);
     } else if (weightController.text.isEmpty) {
@@ -120,8 +120,6 @@ class OnBoardingModel extends ChangeNotifier {
       showDialog(
         context: context,
         builder: (context) {
-          appModel.freshLauched = false;
-          appModel.onboardingData = data;
           return AlertDialog(
             title: const Text('Data collection complete.'),
             content: const Text('Thank you!'),
@@ -135,9 +133,12 @@ class OnBoardingModel extends ChangeNotifier {
                     color: AppColors.secondary,
                   )),
               IconButton(
-                  onPressed: () {
-                    Navigator.of(context).pushReplacement(MaterialPageRoute(
-                        builder: (context) => const AuthProvider()));
+                  onPressed: () async {
+                    final onBoardJson = jsonEncode(data);//encode to json
+                    final prefs = await SharedPreferences.getInstance();
+                    prefs.setString("onBoardJson", onBoardJson);//store to shared preferences
+                    prefs.setBool("onboardingComplete", true);
+                    Navigator.pushReplacementNamed(context, "/register");
                   },
                   icon: const Icon(
                     LineAwesome.check_solid,

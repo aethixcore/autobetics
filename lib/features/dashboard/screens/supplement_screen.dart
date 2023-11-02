@@ -59,7 +59,7 @@ class _SupplementScreenState extends State<SupplementScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(
+        title: const Text(
           'Supplements',
           style: TextStyle(
             fontSize: 20,

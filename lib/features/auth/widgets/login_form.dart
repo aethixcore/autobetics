@@ -1,15 +1,12 @@
 // ignore_for_file: prefer_const_constructors_in_immutables, use_build_context_synchronously
-import 'package:appwrite/appwrite.dart';
-import 'package:autobetics/apis/apis.dart';
-import 'package:autobetics/constants/constants.dart';
+import 'dart:async';
 import 'package:autobetics/models/app_model.dart';
-import 'package:autobetics/models/onboarding_model.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:provider/provider.dart';
-
-import 'package:autobetics/features/dashboard/widgets/bottombar.dart';
+import 'package:supabase_flutter/supabase_flutter.dart' as SB;
 import 'package:autobetics/models/auth_model.dart';
+
+final supabase = SB.Supabase.instance.client;
 
 class LoginForm extends StatefulWidget {
   LoginForm({super.key});
@@ -17,92 +14,36 @@ class LoginForm extends StatefulWidget {
   State<LoginForm> createState() => _LoginFormState();
 }
 
-final accountAPI = AuthAPI(account: autobetAccount);
-final dbAPI = DBAPI(db: autobetDatabase);
-
 class _LoginFormState extends State<LoginForm> {
   final _formKey = GlobalKey<FormState>();
+  late StreamSubscription<SB.AuthState> _sessionStreamSubscription;
   bool obscure = true;
+  @override
+  void initState() {
+    _sessionStreamSubscription =
+        supabase.auth.onAuthStateChange.listen((event) {
+      final session = event.session;
+      if (session != null) {
+        AppModel().updateSession(session);
+        Future.delayed(const Duration(seconds: 3));
+        Navigator.pushReplacementNamed(context, '/dashboard');
+      }
+    });
+    super.initState();
+  }
+
+  @override
+  void dispose() {
+    _sessionStreamSubscription.cancel();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
     final authModel = Provider.of<AuthModel>(context, listen: true);
-    final appModel = Provider.of<AppModel>(context, listen: true);
-    final onboardingModel = Provider.of<OnBoardingModel>(context, listen: true);
+
     void handleSubmit() async {
-      if (_formKey.currentState!.validate()) {
-        if (appModel.freshLauched) {
-          final result = await dbAPI.createDocument(
-              uId: ID.unique(),
-              colId: appModel.userInformation.$id,
-              data: {"goals": onboardingModel.selectedGoals});
-
-          appModel.freshLauched = false;
-        }
-
-        authModel.loading = true;
-        authModel.updateLoading(true);
-        final result = await accountAPI.signIn(
-          email: authModel.emailController.text,
-          password: authModel.passwordController.text,
-        );
-        result.fold((error) {
-          authModel.reset();
-          authModel.updateLoading(false);
-          // Show a notification indicating authentication failure.
-          authModel.updateLoading(false);
-
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text(error.message),
-            ),
-          );
-          authModel.emailFocusNode.requestFocus();
-        }, (userSession) async {
-          appModel.userSession = userSession;
-          appModel.setUserSession(userSession);
-          final authAPI = AuthAPI(account: autobetAccount);
-          final result = await authAPI.getUser();
-
-          result.fold((error) {
-            authModel.reset();
-            authModel.updateLoading(false);
-            // Show a notification indicating authentication failure.
-            authModel.updateLoading(false);
-
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(
-                content: Text(error.message),
-              ),
-            );
-            authModel.emailFocusNode.requestFocus();
-          }, (userInformation) async {
-            //if logging and getting user results is successfuluser
-            print(userInformation);
-            final r = await dbAPI.getDocument(
-                uId: userInformation.$id,
-                colId: dotenv.get("COLLECTION_ID_DASHBOARD"));
-            r.fold((l) => null,
-                (r) => appModel.setDashboardDocs(r)); //set user documnet
-            appModel.userInformation = userInformation;
-            appModel.setUserInformation(userInformation);
-            authModel.reset();
-            authModel.updateLoading(false);
-            if (!userInformation.emailVerification) {
-              appModel.incrementNotificationCount(1);
-            }
-
-            Navigator.of(context).pushReplacement(MaterialPageRoute(
-                builder: (context) => DashboardWithBottomNav()));
-          });
-        });
-        if (result.isRight()) {
-          // Authentication successful, navigate to the dashboard.
-        } else {
-          authModel.reset();
-          authModel.updateLoading(false);
-        }
-      }
+      if (_formKey.currentState!.validate()) {}
     }
 
     return Container(

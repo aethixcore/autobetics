@@ -9,7 +9,8 @@ class AgePicker extends StatelessWidget {
   const AgePicker({super.key});
 
   Future<void> _selectDate(BuildContext context) async {
-    final onBoardingModel = Provider.of<OnBoardingModel>(context, listen: false);
+    final onBoardingModel =
+        Provider.of<OnBoardingModel>(context, listen: false);
     DateTime selectedDate = onBoardingModel.age;
     final DateTime? picked = await showDatePicker(
         context: context,
