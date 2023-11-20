@@ -10,23 +10,23 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
+  final ScrollController _scrollController = ScrollController();
 
+  @override
+  void dispose() {
+    super.dispose();
+    _scrollController.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
     return SingleChildScrollView(
-      controller: ScrollController(),
+      controller: _scrollController,
       child: Container(
         padding: const EdgeInsets.all(20),
         child: const Column(children: [
           DashboardPieChart(),
-          /*   Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Scircle(text: "Hi", icon: FontAwesome.align_left),
-              Scircle(text: "There", icon: FontAwesome.align_left),
-            ],
-          ), */
+
           SizedBox(height: 30),
           TipCard(),
           //end of content normalize

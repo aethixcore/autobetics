@@ -111,17 +111,11 @@ class OnBoardingModel extends ChangeNotifier {
       pageController.jumpToPage(4);
       FocusScope.of(context).requestFocus(listFocusNode);
     } else {
-      final data = {
-        "age": "${age.month}-${age.day}-${age.year}",
-        "weight": weightController.text,
-        "bloodPressure": bloodPressure,
-        "goals": selectedGoals
-      };
       showDialog(
         context: context,
         builder: (context) {
           return AlertDialog(
-            title: const Text('Data collection complete.'),
+            title: const Text('Onboarding complete.'),
             content: const Text('Thank you!'),
             actions: <Widget>[
               IconButton(
@@ -134,9 +128,15 @@ class OnBoardingModel extends ChangeNotifier {
                   )),
               IconButton(
                   onPressed: () async {
-                    final onBoardJson = jsonEncode(data);//encode to json
                     final prefs = await SharedPreferences.getInstance();
-                    prefs.setString("onBoardJson", onBoardJson);//store to shared preferences
+                    prefs.setStringList("goals", selectedGoals);
+                    final onBoardingData = jsonEncode({
+                      "dob": age.toIso8601String(),
+                      "bmi": weightController.text,
+                      "sbp": systolicBPController.text,
+                      "dbp": diastolicBPController.text,
+                    });
+                    prefs.setString("onBoardingData", onBoardingData);
                     prefs.setBool("onboardingComplete", true);
                     Navigator.pushReplacementNamed(context, "/register");
                   },

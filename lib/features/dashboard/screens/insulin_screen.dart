@@ -1,6 +1,13 @@
-// ignore_for_file: library_private_types_in_public_api
+// ignore_for_file: library_private_types_in_public_api, use_build_context_synchronously
 
+import 'dart:convert';
+
+import 'package:autobetics/features/dashboard/screens/bloodsugar_screen.dart';
+import 'package:autobetics/features/widgets/custom_toast.dart';
+import 'package:backendless_sdk/backendless_sdk.dart';
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class InsulinScreen extends StatefulWidget {
   const InsulinScreen({super.key});
@@ -10,61 +17,160 @@ class InsulinScreen extends StatefulWidget {
 }
 
 class _InsulinScreenState extends State<InsulinScreen> {
-  late List<InsulinRecord> _insulinRecords = [];
+  List<InsulinRecord> _insulinRecords = [];
   String _newInsulinValue = "";
-  final DateTime _selectedDateTime = DateTime.now();
+  String _userId = "";
+  final ScrollController _scrollController = ScrollController();
+  final TextEditingController _insulinController = TextEditingController();
+  bool _isLoading = true;
+  bool _noRecords = false;
 
   @override
   void initState() {
     super.initState();
-    setState(() {
-      _insulinRecords = [
-        InsulinRecord(DateTime(2023, 10, 1, 8, 0), 12),
-        InsulinRecord(DateTime(2023, 10, 2, 12, 30), 18),
-        InsulinRecord(DateTime(2023, 10, 3, 10, 15), 15),
-      ];
-    });
+    _getUserId();
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
+    _scrollController.dispose();
+  }
+
+  void _loadInsulinData() async {
+    final records = await getUserSpecificInsulinRecords(_userId);
+    if (mounted) {
+      setState(() {
+        _insulinRecords = records;
+        _isLoading = false;
+        _noRecords = records.isEmpty;
+      });
+    }
+  }
+
+  void _getUserId() async {
+    final prefs = await SharedPreferences.getInstance();
+    final userJson = prefs.getString("userDetails");
+    final userDetails = jsonDecode(userJson!);
+    try {
+      final user = BackendlessUser.fromJson(userDetails);
+      final userId = user.getObjectId();
+      if (mounted) {
+        setState(() {
+          _userId = userId;
+          _loadInsulinData();
+        });
+      }
+    } catch (e) {
+      prefs.setBool("logout", true);
+      Navigator.pushReplacementNamed(context, "/login");
+    }
+  }
+
+  _centerWidget() {
+    if (_isLoading) {
+      return const Center(
+        child: CircularProgressIndicator.adaptive(),
+      );
+    } else {
+      return _noRecords
+          ? const Center(
+              child: Text("No insulin records found."),
+            )
+          : SizedBox(
+              height: 200, // Set a fixed height for the ListView
+              child: ListView.builder(
+                controller: _scrollController,
+                itemCount: _insulinRecords.length,
+                itemBuilder: (context, index) {
+                  final reading = _insulinRecords[index];
+                  return HistoryItem(
+                    value: reading.value,
+                    date:
+                        DateFormat('MMM dd, yyyy hh:mm a').format(reading.date),
+                  );
+                },
+              ),
+            );
+    }
+  }
+
+  void _calculateAndUpdateMean() {
+    final sum = _insulinRecords.fold<double>(
+      0.0,
+          (previousValue, element) => previousValue + element.value,
+    );
+    final mean = sum / _insulinRecords.length;
+
+    // Calculate percentage value and send it to the Stats table
+    final percentageValue = (mean / sum) * 100;
+
+    // Now, you can save the percentageValue to the Stats table
+    _saveStatsData(percentageValue);
+  }
+  Future<void> _saveStatsData(double percentageValue) async {
+    try {
+      final statsQuery = DataQueryBuilder()
+        ..whereClause = "ownerId = '$_userId'"; // Add the appropriate condition to identify the user
+
+      final statsResponse = await Backendless.data.of("Stats").find(statsQuery);
+      if (statsResponse != null && statsResponse.length > 0) {
+        // Update the existing record
+        final existingStatsRecord = statsResponse.first;
+        existingStatsRecord!['insulin'] = percentageValue;
+
+        await Backendless.data.of("Stats").save(existingStatsRecord!);
+      } else {
+        // If no existing record is found, you can choose to create a new one or handle it accordingly.
+        // For now, I'll just log a message.
+        print('No existing record found in Stats table for userId: $_userId');
+      }
+    } catch (e) {
+      CustomToasts.showWarningToast("Error while saving Stats record: $e");
+    }
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      appBar: AppBar(
+        title: const Text(
+          'Add New Insulin Reading:',
+          style: TextStyle(
+            fontSize: 20,
+            fontWeight: FontWeight.bold,
+          ),
+        ),
+      ),
       body: SingleChildScrollView(
-        child: Padding(
+        child: Container(
           padding: const EdgeInsets.all(16.0),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: <Widget>[
-              const Text(
-                'Add New Insulin Reading:',
-                style: TextStyle(
-                  fontSize: 20,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
               const SizedBox(height: 10),
               Row(
                 children: <Widget>[
                   Expanded(
                     child: TextFormField(
+                      controller: _insulinController,
                       decoration: const InputDecoration(
                         labelText: 'Insulin Level (mg/dL)',
                       ),
                       keyboardType: TextInputType.number,
                       onChanged: (value) {
-                        setState(() {
-                          _newInsulinValue = value;
-                        });
+                        if (mounted) {
+                          setState(() {
+                            _newInsulinValue = value;
+                          });
+                        }
                       },
-                      initialValue: _newInsulinValue,
                     ),
                   ),
                   const SizedBox(width: 10),
                   FloatingActionButton(
                     isExtended: true,
-                    onPressed: () {
-                      // Implement adding new supplements functionality.
-                    },
+                    onPressed: _addInsulinRecord,
                     child: const Icon(Icons.add),
                   ),
                 ],
@@ -78,13 +184,7 @@ class _InsulinScreenState extends State<InsulinScreen> {
                 ),
               ),
               const SizedBox(height: 10),
-              ListView.builder(
-                shrinkWrap: true,
-                itemCount: _insulinRecords.length,
-                itemBuilder: (context, index) {
-                  return InsulinRecordItem(_insulinRecords[index]);
-                },
-              ),
+              _centerWidget()
             ],
           ),
         ),
@@ -92,26 +192,53 @@ class _InsulinScreenState extends State<InsulinScreen> {
     );
   }
 
-  void _addInsulinRecord() {
+  void _addInsulinRecord() async {
     if (_newInsulinValue.isNotEmpty) {
-      final newInsulin = int.tryParse(_newInsulinValue);
-      if (newInsulin != null) {
-        final newRecord = InsulinRecord(_selectedDateTime, newInsulin);
-        setState(() {
-          _insulinRecords.add(newRecord);
-          _insulinRecords.sort((a, b) => a.dateTime.compareTo(b.dateTime));
-        });
-        _newInsulinValue = "";
+      final newInsulin = double.parse(_newInsulinValue);
+      if (!newInsulin.isNaN) {
+        try {
+          final data = {
+            "value": newInsulin,
+          };
+
+          await Backendless.data.of("Insulin").save(data);
+          CustomToasts.showInfoToast("Record succesfully sent.");
+          // Clear the text field
+          _insulinController.clear();
+          if (mounted) {
+            setState(() {
+              _newInsulinValue = "";
+            });
+          }
+          final records = await getUserSpecificInsulinRecords(_userId);
+            setState(() {
+              _insulinRecords = records;
+            });
+          // Calculate and update the mean
+          _calculateAndUpdateMean();
+        } catch (e) {
+          CustomToasts.showWarningToast(
+              "Error while saving Insulin record: $e");
+        }
       }
     }
   }
 }
 
 class InsulinRecord {
-  final DateTime dateTime;
-  final int value;
+  final String objectId; // User's ID
+  final double value; // Blood sugar value
+  final DateTime date; // Date
 
-  InsulinRecord(this.dateTime, this.value);
+  InsulinRecord(
+      {required this.objectId, required this.value, required this.date});
+  Map<String, dynamic> toJson() {
+    return {
+      'objectId': objectId, // User's ID
+      'value': value,
+      'date': date.toUtc().toIso8601String(),
+    };
+  }
 }
 
 class InsulinRecordItem extends StatelessWidget {
@@ -123,7 +250,28 @@ class InsulinRecordItem extends StatelessWidget {
   Widget build(BuildContext context) {
     return ListTile(
       title: Text('Insulin Level: ${record.value} mg/dL'),
-      subtitle: Text('Date & Time: ${record.dateTime.toLocal()}'),
+      subtitle: Text('Date & Time: ${record.date.toLocal()}'),
     );
+  }
+}
+
+Future<List<InsulinRecord>> getUserSpecificInsulinRecords(String userId) async {
+  try {
+    final whereClause = "ownerId = '$userId'";
+    final queryBuilder = DataQueryBuilder()..whereClause = whereClause;
+
+    final response = await Backendless.data.of("Insulin").find(queryBuilder);
+
+    final records = (response as List).map<InsulinRecord>((data) {
+      final value =
+          data['value'] is int ? data['value'].toDouble() : data['value'];
+
+      final date = DateTime.parse(data['created'].toString());
+      return InsulinRecord(objectId: userId, value: value, date: date);
+    }).toList();
+
+    return records;
+  } catch (e) {
+    return [];
   }
 }

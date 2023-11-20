@@ -64,8 +64,8 @@ class RegisterScreen extends StatelessWidget {
                                 fit: BoxFit.contain,
                               )),
                         ),
-                        RegisterationForm(),
-                        const SignWithGoogle(),
+                        RegistrationForm(),
+                        // const SignWithGoogle(),
                         /* Row(
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: [

@@ -1,22 +1,23 @@
 import 'package:autobetics/common/routes.dart';
-import 'package:autobetics/features/onboarding/screens/onboarding.dart';
 import 'package:autobetics/models/auth_model.dart';
 import 'package:autobetics/models/onboarding_model.dart';
+import 'package:backendless_sdk/backendless_sdk.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:autobetics/models/app_model.dart';
 import 'package:autobetics/utils/app_colors.dart';
-import 'package:supabase_flutter/supabase_flutter.dart';
 
 GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
 void main() async {
   await dotenv.load(fileName: ".env");
-  await Supabase.initialize(
-    url: dotenv.get("SUPABASE_ENDPOINT"),
-    anonKey: dotenv.get("SUPABASE_KEY"),
-    authFlowType: AuthFlowType.pkce,
-  );
+  Backendless.setUrl(dotenv.get("BL_ENDPOINT"));
+  Backendless.initApp(
+      applicationId: dotenv.get("BL_APPID"),
+      androidApiKey: dotenv.get("BL_ANDROID_API_KEY"),
+      iosApiKey: dotenv.get("BL_IOS_API_KEY"),
+      customDomain: dotenv.get("BL_SUBDOMAIN"));
+
 
   runApp(MultiProvider(
     providers: [
@@ -56,11 +57,10 @@ ColorScheme darkTheme = const ColorScheme(
 
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
+
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      // builder: FToastBuilder(),
-      // navigatorKey: navigatorKey,
       theme: ThemeData(
         colorScheme:
             MediaQuery.of(context).platformBrightness == Brightness.light

@@ -1,4 +1,4 @@
-// ignore_for_file: library_private_types_in_public_api
+// ignore_for_file: library_private_types_in_public_api, use_build_context_synchronously
 
 import 'dart:math';
 
@@ -10,6 +10,7 @@ import 'package:autobetics/features/onboarding/widgets/blood_pressure.dart';
 import 'package:autobetics/features/onboarding/widgets/goals_checklist.dart';
 import 'package:autobetics/features/onboarding/widgets/weight_input.dart';
 import 'package:autobetics/features/onboarding/widgets/age_picker.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class OnboardingScreen extends StatelessWidget {
   const OnboardingScreen({super.key});
@@ -44,8 +45,11 @@ class OnboardingScreen extends StatelessWidget {
           image: 'assets/onboard_2.png',
           nextButton: ElevatedButton(
             child: const Text("Next"),
-            onPressed: () {
+            onPressed: () async {
               if (onBoardingData.weightController.text.isNotEmpty) {
+                final prefs = await SharedPreferences.getInstance();
+                prefs.setDouble(
+                    "bmi", double.parse(onBoardingData.weightController.text));
                 onBoardingData.nextPage();
                 FocusScope.of(context)
                     .requestFocus(onBoardingData.systolicFocusNode);
@@ -63,7 +67,7 @@ class OnboardingScreen extends StatelessWidget {
           child: const BloodPressureInputWidget(),
           nextButton: ElevatedButton(
             child: const Text("Next"),
-            onPressed: () {
+            onPressed: () async {
               if (onBoardingData.diastolicBPController.text.isEmpty) {
                 FocusScope.of(context)
                     .requestFocus(onBoardingData.diastolicFocusNode);
@@ -71,6 +75,11 @@ class OnboardingScreen extends StatelessWidget {
                 FocusScope.of(context)
                     .requestFocus(onBoardingData.systolicFocusNode);
               } else {
+                final prefs = await SharedPreferences.getInstance();
+                prefs.setDouble("sbp",
+                    double.parse(onBoardingData.systolicBPController.text));
+                prefs.setDouble("dbp",
+                    double.parse(onBoardingData.diastolicBPController.text));
                 onBoardingData.nextPage();
               }
             },
@@ -80,7 +89,9 @@ class OnboardingScreen extends StatelessWidget {
           subtitle: 'pick a one of few goals.',
           image: 'assets/onboard_4.png',
           nextButton: ElevatedButton(
-              onPressed: () {
+              onPressed: () async {
+                final prefs = await SharedPreferences.getInstance();
+                prefs.setStringList("goals", onBoardingData.goals);
                 onBoardingData.finishOnboarding(context);
               },
               child: const Text("FINISH")),
@@ -144,37 +155,48 @@ class OnboardingPage extends StatelessWidget {
       curve: Curves.decelerate,
       padding: const EdgeInsets.all(e / log10e),
       height: MediaQuery.sizeOf(context).height,
-      child: Flex(
-        direction: Axis.vertical,
-        children: [
-          const SizedBox(height: 50),
-          Align(
-              alignment: Alignment.topRight,
-              child: Text("${onboardingModel.currentPageIndex + 1}/5")),
-          if (item.prevButton != null)
-            SizedBox(
-              height: 50,
-              child: item.prevButton,
-            ),
-          Text(item.title,
-              style:
-                  const TextStyle(fontSize: 32, fontWeight: FontWeight.bold)),
-          Text(item.subtitle,
-              style: const TextStyle(
-                fontSize: 16,
-              )),
-          Image.asset(item.image, height: 250),
-          const SizedBox(height: 10),
-          if (item.child != null)
-            SizedBox(
-              child: item.child,
-            ),
-          const SizedBox(height: 10),
-          if (item.nextButton != null)
-            SizedBox(
-              child: item.nextButton,
-            ),
-        ],
+      child: SingleChildScrollView(
+        child: Flex(
+          direction: Axis.vertical,
+          children: [
+            const SizedBox(height: 50),
+            ElevatedButton(
+                onPressed: () async {
+                  final prefs = await SharedPreferences.getInstance();
+                  prefs.setBool("skippedOnboarding", true);
+                  prefs.setBool('onboardingComplete', true);
+                
+                  Navigator.pushReplacementNamed(context, "/login");
+                },
+                child: const Text("Skip")),
+            Align(
+                alignment: Alignment.topRight,
+                child: Text("${onboardingModel.currentPageIndex + 1}/5")),
+            if (item.prevButton != null)
+              SizedBox(
+                height: 50,
+                child: item.prevButton,
+              ),
+            Text(item.title,
+                style:
+                    const TextStyle(fontSize: 32, fontWeight: FontWeight.bold)),
+            Text(item.subtitle,
+                style: const TextStyle(
+                  fontSize: 16,
+                )),
+            Image.asset(item.image, height: 250),
+            const SizedBox(height: 10),
+            if (item.child != null)
+              SizedBox(
+                child: item.child,
+              ),
+            const SizedBox(height: 10),
+            if (item.nextButton != null)
+              SizedBox(
+                child: item.nextButton,
+              ),
+          ],
+        ),
       ),
     );
   }

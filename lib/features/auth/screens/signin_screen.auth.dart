@@ -63,7 +63,7 @@ class LoginScreen extends StatelessWidget {
                                 )),
                           ),
                           LoginForm(),
-                          const SignWithGoogle(),
+                          // const SignWithGoogle(),
                           /* Row(
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: [

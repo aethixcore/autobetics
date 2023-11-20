@@ -1,12 +1,16 @@
 // ignore_for_file: prefer_const_constructors_in_immutables, use_build_context_synchronously
-import 'dart:async';
+import 'dart:convert';
+import 'package:autobetics/apis/api.dart';
+import 'package:autobetics/constants/constants.dart';
+import 'package:autobetics/features/widgets/custom_toast.dart';
 import 'package:autobetics/models/app_model.dart';
+import 'package:backendless_sdk/backendless_sdk.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:supabase_flutter/supabase_flutter.dart' as SB;
 import 'package:autobetics/models/auth_model.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
-final supabase = SB.Supabase.instance.client;
+final blApi = BackendlessAPI();
 
 class LoginForm extends StatefulWidget {
   LoginForm({super.key});
@@ -16,34 +20,57 @@ class LoginForm extends StatefulWidget {
 
 class _LoginFormState extends State<LoginForm> {
   final _formKey = GlobalKey<FormState>();
-  late StreamSubscription<SB.AuthState> _sessionStreamSubscription;
   bool obscure = true;
   @override
   void initState() {
-    _sessionStreamSubscription =
-        supabase.auth.onAuthStateChange.listen((event) {
-      final session = event.session;
-      if (session != null) {
-        AppModel().updateSession(session);
-        Future.delayed(const Duration(seconds: 3));
-        Navigator.pushReplacementNamed(context, '/dashboard');
-      }
-    });
     super.initState();
-  }
-
-  @override
-  void dispose() {
-    _sessionStreamSubscription.cancel();
-    super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
     final authModel = Provider.of<AuthModel>(context, listen: true);
-
+    final appModel = Provider.of<AppModel>(context, listen: true);
     void handleSubmit() async {
-      if (_formKey.currentState!.validate()) {}
+      final prefs = await SharedPreferences.getInstance();
+
+      final pushedStats = prefs.getBool('pushedStats') ?? false;
+
+      if (_formKey.currentState!.validate()) {
+        authModel.loading = true;
+        authModel.updateLoading(true);
+        final result = await blApi.signIn(
+            email: authModel.emailController.text,
+            password: authModel.passwordController.text);
+
+        result.fold((error) {
+          authModel.loading = false;
+          authModel.updateLoading(false);
+          CustomToasts.showWarningToast(error.message);
+        }, (response) async {
+          authModel.loading = false;
+          authModel.updateLoading(false);
+          authModel.reset();
+          prefs.setBool("logout", false);
+          CustomToasts.showSuccessToast("Success!");
+          if (pushedStats == false) {
+            final stats = {
+              "diet": 0.0,
+              "exercises": 0.0,
+              "bgl": 0.0,
+              "insulin": 0.0,
+              "supplements": 0.0,
+            };
+            Backendless.data.of("Stats").save(stats).then((value) {
+              CustomToasts.showInfoToast("Upload successful!");
+              prefs.setBool("pushedStats", true);
+
+            }).catchError((e) {
+              CustomToasts.showWarningToast(e.toString());
+            });
+          }
+          Navigator.pushReplacementNamed(context, "/dashboard");
+        });
+      }
     }
 
     return Container(

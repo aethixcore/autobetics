@@ -1,8 +1,9 @@
 // ignore_for_file: use_build_context_synchronously
 
+import 'package:autobetics/apis/api.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-
+final blApi = BackendlessAPI();
 class CheckScreenStatus extends StatefulWidget {
   const CheckScreenStatus({super.key});
 
@@ -20,10 +21,12 @@ class _CheckScreenStatusState extends State<CheckScreenStatus> {
   Future<void> checkStatus() async {
     final onboardingComplete = await isOnboardingComplete();
     final registered = await isRegistered();
+    final prefs = await SharedPreferences.getInstance();
+    final logout = prefs.getBool("logout")!;
 
     if (onboardingComplete) {
-      if (registered) {
-        Navigator.pushReplacementNamed(context, '/login');
+      if (registered || logout == false) {
+        Navigator.pushReplacementNamed(context, '/dashboard');
       } else {
         Navigator.pushReplacementNamed(context, '/register');
       }

@@ -1,23 +1,25 @@
 // ignore_for_file: prefer_const_constructors_in_immutables, use_build_context_synchronously
 
-import 'package:autobetics/apis/supabase.dart';
-import 'package:autobetics/models/app_model.dart';
+import 'dart:convert';
+
+import 'package:autobetics/apis/api.dart';
+import 'package:autobetics/features/widgets/custom_toast.dart';
 import 'package:autobetics/models/auth_model.dart';
 import 'package:flutter/material.dart';
 
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-class RegisterationForm extends StatefulWidget {
-  RegisterationForm({super.key});
+class RegistrationForm extends StatefulWidget {
+  RegistrationForm({super.key});
 
   @override
-  State<RegisterationForm> createState() => _RegisterationFormState();
+  State<RegistrationForm> createState() => _RegistrationFormState();
 }
 
-final subaseAPI = SupaBaseAPI();
+final blApi = BackendlessAPI();
 
-class _RegisterationFormState extends State<RegisterationForm> {
+class _RegistrationFormState extends State<RegistrationForm> {
   final _formKey = GlobalKey<FormState>();
   bool obscure = true;
   @override
@@ -27,29 +29,52 @@ class _RegisterationFormState extends State<RegisterationForm> {
       if (_formKey.currentState!.validate()) {
         authModel.loading = true;
         authModel.updateLoading(true);
-        final email = authModel.emailController.text;
-        final password = authModel.passwordController.text;
-        final fullname = authModel.nameController.text;
+
         final SharedPreferences prefs = await SharedPreferences.getInstance();
-        prefs.setString("email", email);
-        prefs.setString("fullname", fullname);
-        prefs.setString("password", password);
-        final result = await subaseAPI.signUp(email: email, password: password);
-        result.fold((error) {
-          authModel.loading = false;
-          authModel.updateLoading(false);
-          ScaffoldMessenger.of(context)
-              .showSnackBar(SnackBar(content: Text(error.message)));
-        }, (response) {
-          authModel.loading = false;
-          authModel.updateLoading(false);
-          prefs.setBool("newUser", true);
-          prefs.setBool("verified", false);
-          ScaffoldMessenger.of(context)
-              .showSnackBar(const SnackBar(content: Text("Success")));
-          Future.delayed(const Duration(milliseconds: 2001));
-          Navigator.pushReplacementNamed(context, "/dashboard");
-        });
+        final skippedOnboarding = prefs.getBool("skippedOnboarding");
+        final onBoardingData = jsonDecode(prefs.getString("onBoardingData")!);
+
+        if (skippedOnboarding == true || onBoardingData == null) {
+          //skipping onbaarding is allowed for existing users
+          //new users can not proceed to register if they skip onbaarding
+          prefs.setBool('onboardingComplete', false);
+          prefs.setBool("skippedOnboarding", false);
+          prefs.setBool("registered", false);
+          CustomToasts.showWarningToast("Onboarding data not captured!");
+          Navigator.pushReplacementNamed(context, "/onboarding");
+          authModel.reset();
+        } else {
+           final email = authModel.emailController.text;
+          final password = authModel.passwordController.text;
+          final fullname = authModel.nameController.text;
+          final goals = prefs.getStringList("goals");
+          final result = await blApi.signUp(
+            email: email,
+            password: password,
+            name: fullname,
+            bmi: double.parse(onBoardingData["bmi"]),
+            dob: onBoardingData["dob"],
+            dbp: double.parse(onBoardingData["dbp"]),
+            goals: goals!,
+            sbp: double.parse(onBoardingData["sbp"]),
+          );
+          result.fold((error) {
+            authModel.loading = false;
+            authModel.updateLoading(false);
+            CustomToasts.showErrorToast(error.message, context: context);
+          }, (response) async {
+            authModel.loading = false;
+            authModel.updateLoading(false);
+            authModel.reset();
+            CustomToasts.showSuccessToast(
+                "Success. An Email verification is sent!",
+                context: context);
+            prefs.setBool('onboardingComplete', true);
+            prefs.remove("goals");
+            prefs.remove("onBoardingData");
+            Navigator.pushReplacementNamed(context, "/login");
+          });
+        }
       }
     }
 
@@ -69,7 +94,7 @@ class _RegisterationFormState extends State<RegisterationForm> {
                   } else if (!RegExp(
                           r"^([a-zA-Z]{2,}\s[a-zA-z]{1,}'?-?[a-zA-Z]{2,}\s?([a-zA-Z]{1,})?)")
                       .hasMatch(value)) {
-                    return "Invalild Fullname";
+                    return "Invalid Fullname";
                   }
                   return null;
                 },
@@ -102,7 +127,7 @@ class _RegisterationFormState extends State<RegisterationForm> {
                 controller: authModel.passwordController,
                 validator: (value) {
                   if (value == null || value.isEmpty) {
-                    return "Passowrd required";
+                    return "Password required!";
                   } else if (value.length < 8) {
                     return "Password must be at least 8 characters!";
                   }
@@ -130,10 +155,10 @@ class _RegisterationFormState extends State<RegisterationForm> {
                 controller: authModel.confirmPasswordController,
                 validator: (value) {
                   if (value == null || value.isEmpty) {
-                    return "Field can not be ingnored!";
+                    return "Field can not be ignored!";
                   } else if (authModel.passwordController.text.characters !=
                       authModel.confirmPasswordController.text.characters) {
-                    return "Confirm passowrd must match Password";
+                    return "Confirm password must match Password";
                   }
                   return null;
                 },
