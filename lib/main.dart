@@ -7,9 +7,11 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:autobetics/models/app_model.dart';
 import 'package:autobetics/utils/app_colors.dart';
+import 'package:permission_handler/permission_handler.dart';
 
 GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
 void main() async {
+  // await requestAndCheckPermissions();
   await dotenv.load(fileName: ".env");
   Backendless.setUrl(dotenv.get("BL_ENDPOINT"));
   Backendless.initApp(
@@ -74,3 +76,23 @@ class MyApp extends StatelessWidget {
     );
   }
 }
+//
+// Future<void> requestAndCheckPermissions() async {
+//   // Check if photos permission is already granted
+//   var photosStatus = await Permission.photos.status;
+//
+//   // Check if storage permission is already granted
+//   var storageStatus = await Permission.storage.status;
+//
+//
+//   if (photosStatus.isDenied || storageStatus.isDenied) {
+//     // If either permission is not granted, request them
+//     await Permission.photos.request();
+//     await Permission.storage.request();
+//   } else if (photosStatus.isDenied || storageStatus.isDenied) {
+//     // Permissions are denied, show a dialog or message to inform the user
+//     // You might want to explain why you need the permissions
+//   } else if (photosStatus.isGranted && storageStatus.isGranted) {
+//     // Permissions are already granted, you can proceed with your logic
+//   }
+// }

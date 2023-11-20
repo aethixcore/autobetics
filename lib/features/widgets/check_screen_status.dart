@@ -22,7 +22,7 @@ class _CheckScreenStatusState extends State<CheckScreenStatus> {
     final onboardingComplete = await isOnboardingComplete();
     final registered = await isRegistered();
     final prefs = await SharedPreferences.getInstance();
-    final logout = prefs.getBool("logout")!;
+    final logout = prefs.getBool("logout")??false;
 
     if (onboardingComplete) {
       if (registered || logout == false) {
