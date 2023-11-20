@@ -2,6 +2,7 @@
 
 import 'dart:convert';
 
+import 'package:autobetics/apis/api.dart';
 import 'package:autobetics/features/dashboard/screens/bloodsugar_screen.dart';
 import 'package:autobetics/features/widgets/custom_toast.dart';
 import 'package:backendless_sdk/backendless_sdk.dart';
@@ -15,7 +16,7 @@ class InsulinScreen extends StatefulWidget {
   @override
   _InsulinScreenState createState() => _InsulinScreenState();
 }
-
+final blApi = BackendlessAPI();
 class _InsulinScreenState extends State<InsulinScreen> {
   List<InsulinRecord> _insulinRecords = [];
   String _newInsulinValue = "";
@@ -50,21 +51,17 @@ class _InsulinScreenState extends State<InsulinScreen> {
 
   void _getUserId() async {
     final prefs = await SharedPreferences.getInstance();
-    final userJson = prefs.getString("userDetails");
-    final userDetails = jsonDecode(userJson!);
-    try {
-      final user = BackendlessUser.fromJson(userDetails);
-      final userId = user.getObjectId();
-      if (mounted) {
-        setState(() {
-          _userId = userId;
-          _loadInsulinData();
-        });
-      }
-    } catch (e) {
+    final result = await blApi.getCurrentUserDetails(context);
+    result.fold((l) {
       prefs.setBool("logout", true);
       Navigator.pushReplacementNamed(context, "/login");
-    }
+    }, (r){
+      final userId = r.getUserId();
+      setState(() {
+        _userId = userId;
+        _loadInsulinData();
+      });
+    });
   }
 
   _centerWidget() {
