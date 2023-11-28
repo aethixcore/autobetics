@@ -1,20 +1,19 @@
-import 'package:autobetics/apis/auth_api.dart';
-import 'package:autobetics/constants/constants.dart';
+
 import 'package:autobetics/features/dashboard/screens/bloodsugar_screen.dart';
 import 'package:autobetics/features/dashboard/screens/diet_screen.dart';
 import 'package:autobetics/features/dashboard/screens/exercises_screen.dart';
 import 'package:autobetics/features/dashboard/screens/supplement_screen.dart';
 import 'package:autobetics/features/notification/widgets/notification_card.dart';
-import 'package:autobetics/models/app_model.dart';
+// import 'package:autobetics/models/app_model.dart';
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
+// import 'package:provider/provider.dart';
 
 class NotificationScreen extends StatelessWidget {
   const NotificationScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
-    final appModel = Provider.of<AppModel>(context, listen: true);
+    // final appModel = Provider.of<AppModel>(context, listen: true);
     return Scaffold(
       appBar: AppBar(
         title: const Text('Diabetes Management'),
@@ -22,27 +21,14 @@ class NotificationScreen extends StatelessWidget {
       body: ListView(
         padding: const EdgeInsets.all(16),
         children: [
-          if (appModel.verifiedEmail == false)
-            TextButton(
-              onPressed: () async {
-                try {
-                  final account = AuthAPI(account: autobetAccount);
-                  final token = await account.verifyEmail();
-                  if (token.isRight()) {
-                    appModel.setEmailVerified();
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(
-                        content: Text(
-                            "An email verification link has been sent to your email address."),
-                      ),
-                    );
-                  }
-                } catch (e) {
-                  // Handle the error here
-                }
-              },
-              child: const Text('Verify Email'),
-            ),
+          // if (appModel.verifiedEmail == false)
+          //   TextButton(
+          //     onPressed: () async {
+              
+                  
+          //     },
+          //     child: const Text('Verify Email'),
+          //   ),
           buildNotificationCard(
             title: 'Medication Reminder',
             description: 'Take your medication at 8:00 AM and 8:00 PM',

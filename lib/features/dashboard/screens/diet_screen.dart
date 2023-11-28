@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 
 class DietScreen extends StatefulWidget {
-  const DietScreen({Key? key});
+  const DietScreen({super.key});
 
   @override
   State<DietScreen> createState() => _DietScreenState();
@@ -13,6 +14,7 @@ class _DietScreenState extends State<DietScreen> {
   List meals = [];
   bool isLoading = true;
   String error = '';
+  final ScrollController _scrollController = ScrollController();
 
   @override
   void initState() {
@@ -20,7 +22,14 @@ class _DietScreenState extends State<DietScreen> {
     fetchData();
   }
 
+  @override
+  void dispose() {
+    super.dispose();
+    _scrollController.dispose();
+  }
+
   Future<void> fetchData() async {
+
     try {
       final uri = Uri.parse(
           'https://edamam-recipe-search.p.rapidapi.com/api/recipes/v2?type=public&health=low-sugar&imageSize=THUMBNAIL');
@@ -42,10 +51,12 @@ class _DietScreenState extends State<DietScreen> {
         });
       }
     } catch (e) {
-      setState(() {
-        error = 'An error occurred. Please check your internet connection.';
-        isLoading = false;
-      });
+      if (mounted) {
+        setState(() {
+          error = 'An error occurred. Please check your internet connection.';
+          isLoading = false;
+        });
+      }
     }
   }
 
@@ -62,6 +73,7 @@ class _DietScreenState extends State<DietScreen> {
         ),
       ),
       body: SingleChildScrollView(
+        controller: _scrollController,
         child: Container(
           height: MediaQuery.sizeOf(context).height,
           padding: const EdgeInsets.all(16.0),
@@ -71,7 +83,7 @@ class _DietScreenState extends State<DietScreen> {
               const SizedBox(height: 10),
               if (isLoading)
                 const Center(
-                  child: CircularProgressIndicator(),
+                  child: LinearProgressIndicator(),
                 )
               else if (error.isNotEmpty)
                 Center(
@@ -86,11 +98,10 @@ class _DietScreenState extends State<DietScreen> {
                     itemCount: meals.length,
                     itemBuilder: (context, index) {
                       final meal = meals[index]["recipe"];
-                      final List ingredients = meal["ingredients"];
+                      // final List ingredients = meal["ingredients"];
                       return DietPlanItem(
                         title: meal["label"],
-                        description:
-                            '',
+                        description: '',
                         imageUrl: meal["image"],
                       );
                     },

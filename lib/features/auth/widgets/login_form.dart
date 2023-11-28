@@ -1,15 +1,16 @@
 // ignore_for_file: prefer_const_constructors_in_immutables, use_build_context_synchronously
-import 'package:appwrite/appwrite.dart';
-import 'package:autobetics/apis/apis.dart';
+import 'dart:convert';
+import 'package:autobetics/apis/api.dart';
 import 'package:autobetics/constants/constants.dart';
+import 'package:autobetics/features/widgets/custom_toast.dart';
 import 'package:autobetics/models/app_model.dart';
-import 'package:autobetics/models/onboarding_model.dart';
+import 'package:backendless_sdk/backendless_sdk.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:provider/provider.dart';
-
-import 'package:autobetics/features/dashboard/widgets/bottombar.dart';
 import 'package:autobetics/models/auth_model.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+
+final blApi = BackendlessAPI();
 
 class LoginForm extends StatefulWidget {
   LoginForm({super.key});
@@ -17,91 +18,58 @@ class LoginForm extends StatefulWidget {
   State<LoginForm> createState() => _LoginFormState();
 }
 
-final accountAPI = AuthAPI(account: autobetAccount);
-final dbAPI = DBAPI(db: autobetDatabase);
-
 class _LoginFormState extends State<LoginForm> {
   final _formKey = GlobalKey<FormState>();
   bool obscure = true;
+  @override
+  void initState() {
+    super.initState();
+  }
 
   @override
   Widget build(BuildContext context) {
     final authModel = Provider.of<AuthModel>(context, listen: true);
     final appModel = Provider.of<AppModel>(context, listen: true);
-    final onboardingModel = Provider.of<OnBoardingModel>(context, listen: true);
     void handleSubmit() async {
+      final prefs = await SharedPreferences.getInstance();
+
+      final pushedStats = prefs.getBool('pushedStats') ?? false;
+
       if (_formKey.currentState!.validate()) {
-        if (appModel.freshLauched) {
-          final result = await dbAPI.createDocument(
-              uId: ID.unique(),
-              colId: appModel.userInformation.$id,
-              data: {"goals": onboardingModel.selectedGoals});
-
-          appModel.freshLauched = false;
-        }
-
         authModel.loading = true;
         authModel.updateLoading(true);
-        final result = await accountAPI.signIn(
-          email: authModel.emailController.text,
-          password: authModel.passwordController.text,
-        );
+        final result = await blApi.signIn(
+            email: authModel.emailController.text,
+            password: authModel.passwordController.text);
+
         result.fold((error) {
+          authModel.loading = false;
+          authModel.updateLoading(false);
+          CustomToasts.showWarningToast(error.message);
+        }, (response) async {
+          authModel.loading = false;
+          authModel.updateLoading(false);
           authModel.reset();
-          authModel.updateLoading(false);
-          // Show a notification indicating authentication failure.
-          authModel.updateLoading(false);
+          prefs.setBool("logout", false);
+          CustomToasts.showSuccessToast("Success!");
+          if (pushedStats == false) {
+            final stats = {
+              "diet": 0.0,
+              "exercises": 0.0,
+              "bgl": 0.0,
+              "insulin": 0.0,
+              "supplements": 0.0,
+            };
+            Backendless.data.of("Stats").save(stats).then((value) {
+              CustomToasts.showInfoToast("Upload successful!");
+              prefs.setBool("pushedStats", true);
 
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text(error.message),
-            ),
-          );
-          authModel.emailFocusNode.requestFocus();
-        }, (userSession) async {
-          appModel.userSession = userSession;
-          appModel.setUserSession(userSession);
-          final authAPI = AuthAPI(account: autobetAccount);
-          final result = await authAPI.getUser();
-
-          result.fold((error) {
-            authModel.reset();
-            authModel.updateLoading(false);
-            // Show a notification indicating authentication failure.
-            authModel.updateLoading(false);
-
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(
-                content: Text(error.message),
-              ),
-            );
-            authModel.emailFocusNode.requestFocus();
-          }, (userInformation) async {
-            //if logging and getting user results is successfuluser
-            print(userInformation);
-            final r = await dbAPI.getDocument(
-                uId: userInformation.$id,
-                colId: dotenv.get("COLLECTION_ID_DASHBOARD"));
-            r.fold((l) => null,
-                (r) => appModel.setDashboardDocs(r)); //set user documnet
-            appModel.userInformation = userInformation;
-            appModel.setUserInformation(userInformation);
-            authModel.reset();
-            authModel.updateLoading(false);
-            if (!userInformation.emailVerification) {
-              appModel.incrementNotificationCount(1);
-            }
-
-            Navigator.of(context).pushReplacement(MaterialPageRoute(
-                builder: (context) => DashboardWithBottomNav()));
-          });
+            }).catchError((e) {
+              CustomToasts.showWarningToast(e.toString());
+            });
+          }
+          Navigator.pushReplacementNamed(context, "/dashboard");
         });
-        if (result.isRight()) {
-          // Authentication successful, navigate to the dashboard.
-        } else {
-          authModel.reset();
-          authModel.updateLoading(false);
-        }
       }
     }
 

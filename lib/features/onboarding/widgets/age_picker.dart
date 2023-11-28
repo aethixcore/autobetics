@@ -4,12 +4,14 @@ import 'package:autobetics/models/onboarding_model.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class AgePicker extends StatelessWidget {
   const AgePicker({super.key});
 
   Future<void> _selectDate(BuildContext context) async {
-    final onBoardingModel = Provider.of<OnBoardingModel>(context, listen: false);
+    final onBoardingModel =
+        Provider.of<OnBoardingModel>(context, listen: false);
     DateTime selectedDate = onBoardingModel.age;
     final DateTime? picked = await showDatePicker(
         context: context,
@@ -21,6 +23,8 @@ class AgePicker extends StatelessWidget {
         cancelText: "CANCEL");
     if (picked != null) {
       // String dob = getFormattedDate(picked);
+      final prefs = await SharedPreferences.getInstance();
+      prefs.setString("dob", picked.toIso8601String());
       onBoardingModel.updateAge(picked);
       onBoardingModel.age = picked;
       onBoardingModel.nextPage();

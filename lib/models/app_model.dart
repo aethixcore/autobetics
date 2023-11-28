@@ -1,6 +1,6 @@
+import 'package:backendless_sdk/backendless_sdk.dart';
 import 'package:flutter/material.dart';
 import 'package:animated_notch_bottom_bar/animated_notch_bottom_bar/animated_notch_bottom_bar.dart';
-import "package:appwrite/models.dart" as model;
 import 'package:autobetics/utils/app_colors.dart';
 
 class AppModel extends ChangeNotifier {
@@ -9,31 +9,29 @@ class AppModel extends ChangeNotifier {
   late Map onboardingData;
   late bool showNotificationCount = false;
   late int notificationCount = 0;
-  late model.Token? phoneToken;
-  late model.Account userInformation;
-  late model.Session userSession;
-  late bool verifiedEmail = userInformation.emailVerification;
+
+  BackendlessUser? userDeatils;
   //dashbord data with goals
   late Map dashboardDocs = {};
-
-  setPhoneToken(token) {
-    phoneToken = token;
+  updateUser(BackendlessUser? user) {
+    user = user;
     notifyListeners();
   }
 
-  setDashboardDocs(model.Document document) {
-    dashboardDocs = document.data;
+  setPhoneToken(token) {
+    notifyListeners();
+  }
+
+  setDashboardDocs() {
     notifyListeners();
   }
 
 //user information
-  setUserInformation(model.Account userInformation) {
-    this.userInformation = userInformation;
+  setUserInformation() {
     notifyListeners();
   }
 
-  setUserSession(model.Session userSession) {
-    this.userSession = userSession;
+  setUserSession() {
     notifyListeners();
   }
 

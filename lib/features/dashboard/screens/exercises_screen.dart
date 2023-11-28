@@ -1,6 +1,9 @@
 import 'dart:math';
 
+import 'package:autobetics/apis/api.dart';
+import 'package:autobetics/utils/calculate_age.dart';
 import 'package:autobetics/utils/choose_exercise_type.dart';
+import 'package:backendless_sdk/backendless_sdk.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:http/http.dart' as http;
@@ -12,43 +15,45 @@ class ExercisesScreen extends StatefulWidget {
   @override
   State<ExercisesScreen> createState() => _ExercisesScreenState();
 }
-
+final blApi = BackendlessAPI();
 class _ExercisesScreenState extends State<ExercisesScreen> {
   List exercises = []; // This will store the fetched exercise data.
   bool isLoading = true;
   String error = '';
-
   @override
   void initState() {
     super.initState();
     fetchData();
   }
 
+
+
   Future<void> fetchData() async {
-    final apiEndpoint =
-        Uri.parse('https://api.api-ninjas.com/v1/exercises?muscle=muscle');
-    print("api $apiEndpoint");
+    var ageString;
+    final result = await blApi.getCurrentUserDetails(context);
+    result.fold((error) {}, (response) {
+     ageString = response.getProperty("dob");
+    });
+    final int age = calculateAge(ageString);
+    debugPrint("====age====");
+    debugPrint(age.toString());
     try {
       final uri = Uri.parse(
-          'https://api.api-ninjas.com/v1/exercises?type=${chooseExerciseType(30, 39)}');
+          'https://api.api-ninjas.com/v1/exercises?type=${chooseExerciseType(age, 49)}');
       final response =
           await http.get(uri, headers: {'X-Api-Key': dotenv.get("NINJA_KEY")});
       if (response.statusCode == 200) {
         setState(() {
           exercises = json.decode(response.body);
           isLoading = false;
-          print('Status code: ${response.statusCode}');
-          print('Response body: ${exercises}');
-        });
+          });
       } else {
         setState(() {
           error = 'Failed to load data. Please try again later.';
           isLoading = false;
         });
       }
-    } catch (e) {
-      print(e);
-      setState(() {
+    } catch (e) {  setState(() {
         error = 'An error occurred. Please check your internet connection.';
         isLoading = false;
       });
@@ -59,7 +64,7 @@ class _ExercisesScreenState extends State<ExercisesScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(
+        title: const Text(
           'Exercises',
           style: TextStyle(
             fontSize: 20,
@@ -72,7 +77,7 @@ class _ExercisesScreenState extends State<ExercisesScreen> {
         children: <Widget>[
           if (isLoading) // Loading State
             const Center(
-              child: CircularProgressIndicator(),
+              child: LinearProgressIndicator(),
             )
           else if (error.isNotEmpty) // Error State
             Center(
@@ -92,7 +97,6 @@ class CategoryList extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final int idx = Random().nextInt(1000);
     return Expanded(
       child: ListView.builder(
         itemCount: exercises.length, // Use the length of the exercises list

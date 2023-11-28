@@ -1,84 +1,87 @@
+import 'dart:math';
+
+import 'package:autobetics/utils/truncate_string.dart';
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 
 class StoryFeed extends StatelessWidget {
+  final String created;
   final String username;
-  final String profileImageUrl;
+  final String avatar;
   final String postHeading;
   final String postText;
-  final String postImageUrl;
+  final List<dynamic> coverImages;
 
-  const StoryFeed({
-    super.key,
+  StoryFeed({super.key,
+    required this.created,
     required this.username,
-    required this.profileImageUrl,
+    required this.avatar,
     required this.postHeading,
     required this.postText,
-    required this.postImageUrl,
+    required this.coverImages,
   });
-
   @override
   Widget build(BuildContext context) {
-    return Container(
-      margin: const EdgeInsets.all(12),
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(12),
-        image: DecorationImage(
-          image: NetworkImage(postImageUrl),
-          fit: BoxFit.cover,
-        ),
-      ),
-      child: Stack(
+    final cover = coverImages.isNotEmpty? coverImages.first: 'https://picsum.photos/200';
+    return Card(child: Expanded(
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
+         Container(padding: const EdgeInsets.all(e * pi), width: MediaQuery.sizeOf(context).width * 0.6,child:  RichText(
+           text: TextSpan(
+             style: DefaultTextStyle.of(context).style,
+             children:  [
+               TextSpan(
+                 text: truncateString(postHeading, 30),
+                 style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
+               ),
+               const TextSpan(
+                 text: '\n', // Adding some space between description and timestamp
+               ),
+               TextSpan(
+                 text: truncateString(postText, 50),
+                 style: const TextStyle(fontSize: 14),
+               ),
+               const TextSpan(
+                 text: '\n\n', // Adding some space between description and timestamp
+               ),
+                TextSpan(
+                 text:'Posted on ${DateFormat.yMd().format(DateTime.parse(created))}',
+                 style: const TextStyle(color: Colors.grey),
+               ),
+               // const TextSpan(
+               //   text: '  ', // Add some space between timestamp and read duration
+               // ),
+               // const TextSpan(
+               //   text: 'Read Duration: 5 min',
+               //   style: TextStyle(color: Colors.grey),
+               // ),
+             ],
+           ),
+         )),
+          Stack(
             children: [
-              const SizedBox(height: 12),
-              CircleAvatar(
-                radius: 24,
-                backgroundImage: NetworkImage(profileImageUrl),
-              ),
-              const SizedBox(height: 12),
-              Text(
-                username,
-                style: const TextStyle(
-                  fontWeight: FontWeight.bold,
-                  fontSize: 16,
+
+              Container(
+                padding: const EdgeInsets.all(pi),
+                width: MediaQuery.of(context).size.width * 0.30,
+                height: 150,
+                child: ClipRRect(
+                  borderRadius: const BorderRadius.all(Radius.elliptical(12, 12)),
+                  child: Image.network(
+cover,                    fit: BoxFit.fitHeight, // Use BoxFit.cover to ensure the image fills the rounded container
+                  ),
                 ),
               ),
-              const SizedBox(height: 8),
-              Text(
-                postText,
-                style: const TextStyle(fontSize: 14),
-              ),
+               Positioned(bottom: 7, left: 7,child: CircleAvatar(
+                radius: 20,
+                backgroundImage: NetworkImage(avatar),
+              )),
             ],
-          ),
-          Positioned(
-            bottom: 12,
-            left: 12,
-            right: 12,
-            child: Container(
-              decoration: BoxDecoration(
-                color: Colors.black.withOpacity(0.5),
-                borderRadius: BorderRadius.circular(12),
-              ),
-              padding: const EdgeInsets.all(8),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    postHeading,
-                    style: const TextStyle(
-                      fontSize: 16,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                  // Add your time and source here
-                ],
-              ),
-            ),
-          ),
+          )
         ],
       ),
-    );
+    ));
   }
 }

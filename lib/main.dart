@@ -1,17 +1,25 @@
+import 'package:autobetics/common/routes.dart';
 import 'package:autobetics/models/auth_model.dart';
 import 'package:autobetics/models/onboarding_model.dart';
+import 'package:backendless_sdk/backendless_sdk.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-
 import 'package:autobetics/models/app_model.dart';
-import 'package:autobetics/providers/onboarding_provider.dart';
-import 'package:autobetics/providers/auth_provider.dart';
 import 'package:autobetics/utils/app_colors.dart';
+import 'package:permission_handler/permission_handler.dart';
 
 GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
 void main() async {
+  requestAndCheckPermissions();
   await dotenv.load(fileName: ".env");
+  Backendless.setUrl(dotenv.get("BL_ENDPOINT"));
+  Backendless.initApp(
+      applicationId: dotenv.get("BL_APPID"),
+      androidApiKey: dotenv.get("BL_ANDROID_API_KEY"),
+      iosApiKey: dotenv.get("BL_IOS_API_KEY"),
+      customDomain: dotenv.get("BL_SUBDOMAIN"));
+
 
   runApp(MultiProvider(
     providers: [
@@ -51,12 +59,10 @@ ColorScheme darkTheme = const ColorScheme(
 
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
+
   @override
   Widget build(BuildContext context) {
-    final appData = Provider.of<AppModel>(context);
     return MaterialApp(
-      // builder: FToastBuilder(),
-      // navigatorKey: navigatorKey,
       theme: ThemeData(
         colorScheme:
             MediaQuery.of(context).platformBrightness == Brightness.light
@@ -64,14 +70,25 @@ class MyApp extends StatelessWidget {
                 : darkTheme,
         useMaterial3: true,
       ),
-      home: appData.freshLauched
-          ? const SafeArea(
-              child: OnboardingProvider(),
-            )
-          : const SafeArea(
-              child: AuthProvider(),
-            ),
       debugShowCheckedModeBanner: false,
+      routes: routes,
+      initialRoute: "/check_screen_status",
     );
+  }
+}
+
+Future<void> requestAndCheckPermissions() async {
+  // Check if photos permission is already granted
+  var photosStatus = await Permission.photos.status;
+
+  // Check if storage permission is already granted
+  var storageStatus = await Permission.storage.status;
+
+if (!photosStatus.isGranted || !storageStatus.isDenied) {
+    // If either permission is not granted, request them
+    await Permission.photos.request();
+    await Permission.storage.request();
+  } else if (photosStatus.isGranted && storageStatus.isGranted) {
+    // Permissions are already granted, you can proceed with your logic
   }
 }

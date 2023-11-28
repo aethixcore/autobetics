@@ -28,8 +28,8 @@ class WeightInputScreen extends StatelessWidget {
             ),
             onChanged: (weight) {
               final double parsedValue = double.tryParse(weight) ?? 0.0;
-              onBoardingModel.updateWeight(parsedValue);
               onBoardingModel.weight = parsedValue;
+              onBoardingModel.updateWeight(parsedValue);
             },
           ),
           const SizedBox(height: 20.0),

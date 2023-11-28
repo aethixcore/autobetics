@@ -1,23 +1,22 @@
-import 'package:appwrite/models.dart';
-import 'package:autobetics/apis/auth_api.dart';
-import 'package:autobetics/constants/constants.dart';
+// ignore_for_file: use_build_context_synchronously
+
+import 'package:autobetics/apis/api.dart';
 import 'package:autobetics/features/dashboard/screens/bloodsugar_screen.dart';
 import 'package:autobetics/features/dashboard/screens/diet_screen.dart';
 import 'package:autobetics/features/dashboard/screens/exercises_screen.dart';
 import 'package:autobetics/features/dashboard/screens/insulin_screen.dart';
 import 'package:autobetics/features/dashboard/screens/supplement_screen.dart';
-import 'package:autobetics/features/notification/screens/notification_screen.dart';
-import 'package:autobetics/features/profile/profile_screen.dart';
-import 'package:autobetics/features/settings/screens/settings_screen.dart';
+import 'package:autobetics/features/widgets/custom_toast.dart';
 import 'package:autobetics/models/app_model.dart';
 import 'package:autobetics/features/dashboard/screens/home_screen.dart';
-import 'package:autobetics/providers/auth_provider.dart';
 import 'package:autobetics/utils/app_colors.dart';
 import 'package:autobetics/features/dashboard/widgets/greeting.dart';
+import 'package:backendless_sdk/backendless_sdk.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:icons_plus/icons_plus.dart';
 import 'package:provider/provider.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 List<Widget> tabbarIcons = const [
   Icon(FontAwesome.hourglass),
@@ -27,7 +26,7 @@ List<Widget> tabbarIcons = const [
   Icon(FontAwesome.syringe),
   Icon(FontAwesome.pills),
 ];
-
+final blApi = BackendlessAPI();
 class DashboardTabbar extends StatefulWidget {
   const DashboardTabbar({super.key});
 
@@ -38,32 +37,24 @@ class DashboardTabbar extends StatefulWidget {
 class _DashboardTabbarState extends State<DashboardTabbar>
     with SingleTickerProviderStateMixin {
   late TabController _tabController;
-  Account? _user;
 
   @override
-  void initState() {
+  initState() {
     super.initState();
-    _tabController = TabController(length: 6, vsync: this);
-    // Load user data only if it's not already loaded
-    if (_user == null) {
-      loadUserData();
+    if (mounted) {
+      setState(() {
+        _tabController = TabController(length: 6, vsync: this);
+      });
     }
   }
 
-  Future<void> loadUserData() async {
-    final api = AuthAPI(account: autobetAccount);
-    final result = await api.getUser();
-    result.fold((left) {}, (right) {
-      setState(() {
-        _user = right;
-      });
-    });
-  }
 
   @override
-  void dispose() {
-    super.dispose();
-    _tabController.dispose();
+  dispose() {
+    if (mounted) {
+      _tabController.dispose();
+      super.dispose();
+    }
   }
 
   @override
@@ -77,12 +68,8 @@ class _DashboardTabbarState extends State<DashboardTabbar>
       child: Scaffold(
         appBar: AppBar(
           toolbarHeight: MediaQuery.sizeOf(context).height * 0.105,
-          leading:
-              _user != null ? Greeting(appData.userInformation.name) : null,
+          leading: Greeting(),
           leadingWidth: MediaQuery.sizeOf(context).width,
-          /* 
-
-           */
           actions: [
             PopupMenuButton<int>(
               icon: Badge(
@@ -129,43 +116,17 @@ class _DashboardTabbarState extends State<DashboardTabbar>
               ],
               onSelected: (value) async {
                 if (value == 1) {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => const ProfileScreen(),
-                    ),
-                  );
+                  Navigator.pushNamed(context, "/profile");
                 } else if (value == 2) {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => const NotificationScreen(),
-                    ),
-                  );
+                  Navigator.pushNamed(context, "/notifications");
                 } else if (value == 3) {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => const SettingsScreen(),
-                    ),
-                  );
+                  Navigator.pushNamed(context, "/settings");
                 } else if (value == 4) {
-                  final authAPI = AuthAPI(account: autobetAccount);
-                  final result =
-                      await authAPI.logOut(appData.userSession.$id as dynamic);
-                  result.fold((error) {
-                    ScaffoldMessenger.of(context)
-                        .showSnackBar(SnackBar(content: Text(error.message)));
-                  }, (userSession) {
-                    appData.userSession = userSession;
-                    appData.setUserSession(userSession);
-                    Navigator.pushReplacement(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => const AuthProvider(),
-                      ),
-                    );
-                  });
+                  final prefs = await SharedPreferences.getInstance();
+                  prefs.setBool("logout", true);
+                  await Backendless.userService.logout();
+                  CustomToasts.showDefaultToast("Logged out!");
+                  Navigator.pushReplacementNamed(context, "/register");
                 }
               },
             )

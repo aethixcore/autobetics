@@ -4,6 +4,7 @@ import 'package:autobetics/models/auth_model.dart';
 import 'package:autobetics/utils/app_colors.dart';
 import 'package:autobetics/features/auth/widgets/register_form.dart';
 import 'package:autobetics/features/auth/widgets/signwith_google.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -48,6 +49,12 @@ class RegisterScreen extends StatelessWidget {
                               style: const TextStyle(
                                   fontSize: 32, letterSpacing: 2.3)),
                         ),
+                        const Center(
+                          child: ListTile(
+                              leading:
+                                  Icon(CupertinoIcons.hand_point_right_fill),
+                              title: Text("Swipe to move to login")),
+                        ),
                         SizedBox(
                           height: 200,
                           child: FractionallySizedBox(
@@ -57,8 +64,8 @@ class RegisterScreen extends StatelessWidget {
                                 fit: BoxFit.contain,
                               )),
                         ),
-                        RegisterationForm(),
-                        const SignWithGoogle(),
+                        RegistrationForm(),
+                        // const SignWithGoogle(),
                         /* Row(
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: [
