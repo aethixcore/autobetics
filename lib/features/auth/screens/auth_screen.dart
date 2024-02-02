@@ -14,7 +14,7 @@ class AuthScreen extends StatefulWidget {
 }
 
 class _AuthScreenState extends State<AuthScreen> {
-  bool logout = false;
+  bool _logout = false;
 
   @override
   void initState() {
@@ -24,9 +24,9 @@ class _AuthScreenState extends State<AuthScreen> {
 
   getLoginState() async {
     final prefs = await SharedPreferences.getInstance();
-    final state = prefs.getBool("logout") ?? false;
+    final state = prefs.getBool("logout");
     setState(() {
-      logout = state;
+      _logout = state!;
     });
   }
 
@@ -39,7 +39,7 @@ class _AuthScreenState extends State<AuthScreen> {
       },
       pageSnapping: true,
       itemCount: authPages.length,
-      controller: PageController(initialPage: logout ? 1 : 0),
+      controller: PageController(initialPage: _logout == true ? 0 : 1),
     );
   }
 }

@@ -17,7 +17,7 @@ import 'package:flutter/material.dart';
 
 Map<String, Widget Function(BuildContext)> routes = {
   "/bgl": (context) => const BloodSugarScreen(),
-  "/check_screen_status": (context) => const CheckScreenStatus(),
+  "/": (context) => const CheckScreenStatus(),
   "/dashboard": (context) => DashboardWithBottomNav(),
   "/diet": (context) => const DietScreen(),
   "/exercises": (context) => const ExercisesScreen(),

@@ -163,10 +163,9 @@ class OnboardingPage extends StatelessWidget {
             ElevatedButton(
                 onPressed: () async {
                   final prefs = await SharedPreferences.getInstance();
-                  prefs.setBool("skippedOnboarding", true);
-                  prefs.setBool('onboardingComplete', true);
-                
-                  Navigator.pushReplacementNamed(context, "/login");
+                  prefs.setBool("skippedOnboarding", true);//jump to auth screen but can't register
+                  prefs.setBool("onboardingComplete", true);// hides the onboarding from showing up
+                  Navigator.pushReplacementNamed(context, "/register");
                 },
                 child: const Text("Skip")),
             Align(

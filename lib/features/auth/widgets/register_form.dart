@@ -31,16 +31,16 @@ class _RegistrationFormState extends State<RegistrationForm> {
         authModel.updateLoading(true);
 
         final SharedPreferences prefs = await SharedPreferences.getInstance();
-        final skippedOnboarding = prefs.getBool("skippedOnboarding");
+        final skippedOnboarding = prefs.getBool("skippedOnboarding")??true;
         final onBoardingData = jsonDecode(prefs.getString("onBoardingData")!);
 
-        if (skippedOnboarding == true || onBoardingData == null) {
+        if (skippedOnboarding) {
           //skipping onbaarding is allowed for existing users
           //new users can not proceed to register if they skip onbaarding
           prefs.setBool('onboardingComplete', false);
           prefs.setBool("skippedOnboarding", false);
           prefs.setBool("registered", false);
-          CustomToasts.showWarningToast("Onboarding data not captured!");
+          CustomToasts.showWarningToast("Onboarding not captured!");
           Navigator.pushReplacementNamed(context, "/onboarding");
           authModel.reset();
         } else {

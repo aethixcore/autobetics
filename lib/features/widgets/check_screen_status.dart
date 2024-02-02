@@ -19,10 +19,12 @@ class _CheckScreenStatusState extends State<CheckScreenStatus> {
   }
 
   Future<void> checkStatus() async {
-    final onboardingComplete = await isOnboardingComplete();
-    final registered = await isRegistered();
+
+
     final prefs = await SharedPreferences.getInstance();
+    final registered = prefs.getBool('registered') ?? false;
     final logout = prefs.getBool("logout")??false;
+    final onboardingComplete = prefs.getBool('onboardingComplete') ?? false;
 
     if (onboardingComplete) {
       if (registered || logout == false) {
@@ -45,12 +47,3 @@ class _CheckScreenStatusState extends State<CheckScreenStatus> {
   }
 }
 
-Future<bool> isRegistered() async {
-  final prefs = await SharedPreferences.getInstance();
-  return prefs.getBool('registered') ?? false;
-}
-
-Future<bool> isOnboardingComplete() async {
-  final prefs = await SharedPreferences.getInstance();
-  return prefs.getBool('onboardingComplete') ?? false;
-}

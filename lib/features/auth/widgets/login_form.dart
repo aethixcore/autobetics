@@ -68,7 +68,7 @@ class _LoginFormState extends State<LoginForm> {
               CustomToasts.showWarningToast(e.toString());
             });
           }
-          Navigator.pushReplacementNamed(context, "/dashboard");
+          Navigator.pushReplacementNamed(context, "/dashboard", arguments: {"pageIndex":0});
         });
       }
     }

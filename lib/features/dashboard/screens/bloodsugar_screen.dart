@@ -88,7 +88,7 @@ class _BloodSugarScreenState extends State<BloodSugarScreen> {
         final existingStatsRecord = statsResponse.first;
         existingStatsRecord!['bgl'] = percentageValue;
 
-        await Backendless.data.of("Stats").save(existingStatsRecord!);
+        await Backendless.data.of("Stats").save(existingStatsRecord);
       } else {
         // If no existing record is found, you can choose to create a new one or handle it accordingly.
         // For now, I'll just log a message.

@@ -3,14 +3,15 @@
 import 'dart:convert';
 import 'dart:io';
 import 'package:autobetics/features/widgets/custom_toast.dart';
+import 'package:autobetics/models/app_model.dart';
 import 'package:autobetics/utils/app_colors.dart';
 import 'package:backendless_sdk/backendless_sdk.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/foundation.dart' as foundation;
 import 'package:emoji_picker_flutter/emoji_picker_flutter.dart';
-import 'package:flutter/services.dart';
 import 'package:multi_image_picker_view/multi_image_picker_view.dart';
+import 'package:provider/provider.dart';
 
 class StoryCreation extends StatefulWidget {
   const StoryCreation({Key? key}) : super(key: key);
@@ -223,6 +224,7 @@ class _StoryCreationState extends State<StoryCreation> {
       final user = await Backendless.userService.getCurrentUser();
       final name = user!.getProperty('name');
       List<String> uploadedImageUrls = await _uploadMultipleImages();
+      final appData = Provider.of<AppModel>(context,listen: false);
       if (_multiImageController.images.isEmpty) {
         try {
           await Backendless.data.of("Stories").save({
@@ -234,7 +236,9 @@ class _StoryCreationState extends State<StoryCreation> {
           CustomToasts.showInfoToast("Story created");
           _storyController.clear();
           _titleController.clear();
-          Navigator.pushNamed(context, "stories");
+          appData.jumpTo(1);
+          Navigator.pushReplacementNamed(context, "/dashboard",
+              arguments: {"pageIndex": 1});
         } catch (e) {
           debugPrint(e.toString());
         }
@@ -252,7 +256,9 @@ class _StoryCreationState extends State<StoryCreation> {
           _multiImageController.dispose();
           _titleController.clear();
           _storyController.clear();
-          Navigator.pushNamed(context, "stories");
+          appData.jumpTo(1);
+          Navigator.pushReplacementNamed(context, "/dashboard",
+              arguments: {"pageIndex": 1});
         } catch (e) {
           debugPrint(e.toString());
         }

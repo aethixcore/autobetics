@@ -138,7 +138,7 @@ class OnBoardingModel extends ChangeNotifier {
                     });
                     prefs.setString("onBoardingData", onBoardingData);
                     prefs.setBool("onboardingComplete", true);
-                    Navigator.pushReplacementNamed(context, "/register");
+                    Navigator.pushReplacementNamed(context, "/register", );
                   },
                   icon: const Icon(
                     LineAwesome.check_solid,
